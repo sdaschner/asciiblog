@@ -1,0 +1,5 @@
+= AsciiDoc Blog
+Sebastian Daschner
+
+A Java EE blog application with Git and AsciidoctorJ integration. Connects with a Git repository where the blog posts
+-- written in AsciiDoc -- are managed. The posts are processed to HTML snippets via AsciidoctorJ and rendered on the fly with Mustache templates.
