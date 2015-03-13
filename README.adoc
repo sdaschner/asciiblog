@@ -2,4 +2,11 @@
 Sebastian Daschner
 
 A Java EE blog application with Git and AsciidoctorJ integration. Connects with a Git repository where the blog posts
--- written in AsciiDoc -- are managed. The posts are processed to HTML snippets via AsciidoctorJ and rendered on the fly with Mustache templates.
+-- written in AsciiDoc -- are managed.
+
+Processes the blog posts to HTML snippets via AsciidoctorJ and renders them on the fly with Mustache templates.
+
+Tested with Wildfly 8.2. A separate Wildfly Module is needed because of the JRuby integration of AsciidoctorJ.
+See https://github.com/asciidoctor/asciidoctorj#running-asciidoctorj-on-wildfly-as[Running AsciidoctorJ on WildFly AS].
+
+// For a full description see TODO blog post 
