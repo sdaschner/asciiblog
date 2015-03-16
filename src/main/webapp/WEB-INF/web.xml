@@ -4,7 +4,7 @@
     <!-- Needed to override the servlet registration of JAX-RS -->
     <servlet-mapping>
         <servlet-name>default</servlet-name>
-        <url-pattern>/static/*</url-pattern>
+        <url-pattern>/blog/static/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

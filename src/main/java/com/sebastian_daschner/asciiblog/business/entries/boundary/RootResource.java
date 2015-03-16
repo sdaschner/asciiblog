@@ -16,8 +16,8 @@
 
 package com.sebastian_daschner.asciiblog.business.entries.boundary;
 
-import com.sebastian_daschner.asciiblog.business.entries.control.HtmlGenerator;
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
+import com.sebastian_daschner.asciiblog.business.views.entity.View;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -27,7 +27,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 @Path("/")
@@ -40,13 +42,13 @@ public class RootResource {
     @Inject
     EntriesStore entriesStore;
 
-    @Inject
-    HtmlGenerator htmlGenerator;
-
     @GET
-    public String index() {
+    public View index() {
+        final Map<String, Object> model = new HashMap<>();
         final List<Entry> teaserEntries = entriesStore.getTeaserEntries();
-        return htmlGenerator.generateIndex(teaserEntries);
+        model.put("entries", teaserEntries);
+
+        return new View("index", model);
     }
 
     @Path("entries")

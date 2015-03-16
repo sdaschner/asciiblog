@@ -1,10 +1,12 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
-    <title>{{title}} - Sebastian Daschner</title>
+    <title>${entry.title} - Sebastian Daschner</title>
     <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body>
@@ -12,9 +14,9 @@
     <h1><a href="http://blog.sebastian-daschner.com">SD blog</a></h1>
 </header>
 <main>
-    <h2 class="highlight">{{title}}</h2>
-    <span class="note">Published on {{date}}</span>
-    {{{content}}}
+    <h2 class="highlight">${entry.title}</h2>
+    <span class="note">Published on ${entry.date}</span>
+    ${entry.content}
 </main>
 <footer>
     <hr/>
