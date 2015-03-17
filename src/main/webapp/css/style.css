@@ -139,6 +139,7 @@ pre, code {
     line-height: 1.3em;
     background-color: #eee;
     color: #000;
+    overflow-x: auto;
 }
 
 a {
@@ -249,7 +250,7 @@ footer span {
     border: none;
 }
 
-.teaser span {
+.teaser span, span.date {
     font-size: 0.9em;
     margin-top: 0.7em;
     color: #999;

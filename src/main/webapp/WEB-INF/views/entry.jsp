@@ -29,7 +29,7 @@
 </header>
 <main>
     <h2 class="highlight">${entry.title}</h2>
-    <span class="note">Published on ${entry.date}</span>
+    <span class="date">Published on ${entry.date}</span>
     ${entry.content}
 </main>
 <footer>
