@@ -11,7 +11,21 @@
 </head>
 <body>
 <header>
-    <h1><a href="http://blog.sebastian-daschner.com">SD blog</a></h1>
+    <h1>
+        <a href="http://blog.sebastian-daschner.com"><strong>sebastiandaschner</strong> blog</a>
+    </h1>
+    <hr>
+    <ul>
+        <li>
+            <a href="http://www.sebastian-daschner.com">Home</a>
+        </li>
+        <li>
+            <a href="http://blog.sebastian-daschner.com">Blog</a>
+        </li>
+        <li>
+            <a href="http://www.sebastian-daschner.com/contact">Contact</a>
+        </li>
+    </ul>
 </header>
 <main>
     <h2 class="highlight">${entry.title}</h2>
@@ -19,12 +33,6 @@
     ${entry.content}
 </main>
 <footer>
-    <hr/>
-    <ul>
-        <li><a href="http://www.sebastian-daschner.com">Home</a></li>
-        <li><a href="http://blog.sebastian-daschner.com">Blog</a></li>
-        <li><a href="https://twitter.com/DaschnerS">@DaschnerS</a></li>
-    </ul>
     <span>&copy; Sebastian Daschner, CC BY-NC-SA 4.0</span>
 </footer>
 </body>

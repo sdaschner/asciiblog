@@ -3,31 +3,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="description" content=""/>
-  <meta name="keywords" content=""/>
-  <title>All blog entries - Sebastian Daschner</title>
-  <link rel="stylesheet" href="/static/css/style.css"/>
+    <meta charset="utf-8"/>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <title>All blog entries - Sebastian Daschner</title>
+    <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body>
 <header>
-  <h1><a href="http://blog.sebastian-daschner.com">SD blog</a></h1>
+    <h1>
+        <a href="http://blog.sebastian-daschner.com"><strong>sebastiandaschner</strong> blog</a>
+    </h1>
+    <hr>
+    <ul>
+        <li>
+            <a href="http://www.sebastian-daschner.com">Home</a>
+        </li>
+        <li>
+            <a href="http://blog.sebastian-daschner.com">Blog</a>
+        </li>
+        <li>
+            <a href="http://www.sebastian-daschner.com/contact">Contact</a>
+        </li>
+    </ul>
 </header>
 <main>
-  <p>
+    <p>
     <c:forEach var="entry" items="${entries}">
-    <a href="/entries/${entry.link}">${entry.title}</a><br>
+            <a href="/entries/${entry.link}">${entry.title}</a><br>
     </c:forEach>
-  </p>
+    </p>
 </main>
 <footer>
-  <hr/>
-  <ul>
-    <li><a href="http://www.sebastian-daschner.com">Home</a></li>
-    <li><a href="http://blog.sebastian-daschner.com">Blog</a></li>
-    <li><a href="https://twitter.com/DaschnerS">@DaschnerS</a></li>
-  </ul>
-  <span>&copy; Sebastian Daschner, CC BY-NC-SA 4.0</span>
+    <span>&copy; Sebastian Daschner, CC BY-NC-SA 4.0</span>
 </footer>
 </body>
 </html>
