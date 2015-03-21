@@ -18,6 +18,7 @@ package com.sebastian_daschner.asciiblog.business.environment.control;
 
 import javax.enterprise.inject.Produces;
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Paths;
 
 public class EnvironmentDataProvider {
@@ -30,6 +31,11 @@ public class EnvironmentDataProvider {
     @Produces
     public File getGitLocation() {
         return Paths.get(System.getProperty("blog.git.location")).toFile();
+    }
+
+    @Produces
+    public URI getHomeUri() {
+        return URI.create(System.getProperty("blog.uri.home"));
     }
 
 }
