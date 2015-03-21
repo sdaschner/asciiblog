@@ -9,4 +9,7 @@ Processes the blog posts to HTML snippets via AsciidoctorJ.
 Tested with Wildfly 8.2. A separate Wildfly Module is needed because of the JRuby integration of AsciidoctorJ.
 See https://github.com/asciidoctor/asciidoctorj#running-asciidoctorj-on-wildfly-as[Running AsciidoctorJ on WildFly AS].
 
-// For a full description see TODO blog post
+When deploying on Wildfly, the `servlet-container` configuration has to be set to `allow-non-standard-wrappers="true"`
+for allowing the View message body writer to forward the request to a JSP view.
+
+//For a full description see TODO blog post
