@@ -50,7 +50,6 @@ public class ViewWriterExtension implements MessageBodyWriter<View> {
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
-        // only html is supported
         return View.class.isAssignableFrom(type);
     }
 
@@ -60,7 +59,8 @@ public class ViewWriterExtension implements MessageBodyWriter<View> {
     }
 
     @Override
-    public void writeTo(final View view, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(final View view, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType,
+                        final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException, WebApplicationException {
         view.getModel().entrySet().forEach(e -> request.setAttribute(e.getKey(), e.getValue()));
         try {
             request.getRequestDispatcher(view.getPath()).forward(request, response);

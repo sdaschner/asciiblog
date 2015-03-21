@@ -24,7 +24,10 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.*;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevObject;
+import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
@@ -109,14 +112,14 @@ public class GitExtractor {
 
         try {
             final Set<ObjectId> tagCommitIds = repository.getTags().values().stream()
-                    .map(Ref::getObjectId).map(id -> {
+                    .map(Ref::getLeaf).map(Ref::getObjectId).map(id -> {
                         try {
-                            return revWalk.parseTag(id);
+                            return revWalk.parseCommit(id);
                         } catch (IOException e) {
                             return null;
                         }
                     }).filter(Objects::nonNull)
-                    .map(RevTag::getObject).map(RevObject::getId)
+                    .map(RevObject::getId)
                     .collect(Collectors.toSet());
 
             revWalk.markStart(revWalk.parseCommit(currentHead));
