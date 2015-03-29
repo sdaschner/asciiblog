@@ -12,4 +12,4 @@ See https://github.com/asciidoctor/asciidoctorj#running-asciidoctorj-on-wildfly-
 When deploying on Wildfly, the `servlet-container` configuration has to be set to `allow-non-standard-wrappers="true"`
 for allowing the View message body writer to forward the request to a JSP view.
 
-//For a full description see TODO blog post
+For a full description see http://blog.sebastian-daschner.com/entries/blog_with_asciidoc_update[Blog written in AsciiDoc].
