@@ -17,19 +17,24 @@
 package com.sebastian_daschner.asciiblog.business.source.control;
 
 import com.sebastian_daschner.asciiblog.business.environment.control.Environment;
+import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
+import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSetBuilder;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 
 public class GitExtractorTest {
 
@@ -41,54 +46,139 @@ public class GitExtractorTest {
     @Before
     public void setUp() throws IOException, GitAPIException {
         cut = new GitExtractor();
+        cut.nameNormalizer = Mockito.mock(NameNormalizer.class);
         cut.env = Environment.INTEGRATION;
         cut.gitDirectory = Files.createTempDirectory("git-blog-").toFile();
         gitCloneDirectory = Files.createTempDirectory("git-clone-").toFile();
         file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1").toFile();
         file2 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file2").toFile();
+
+        // return the same file name as "normalized"
+        Mockito.when(cut.nameNormalizer.normalize(anyString())).then(i -> i.getArguments()[0]);
         initGitAndClone();
         addTestCommits();
     }
 
     @Test
-    public void testGetChangedFiles() throws GitAPIException, IOException {
+    public void testGetChanges() throws GitAPIException, IOException {
         cut.openGit();
 
-        final Map<String, String> expectedFiles = new HashMap<>();
-        expectedFiles.put("file1", "hello world\nhello world");
-        expectedFiles.put("file2", "hi world");
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello world")
+                .andChangedFile("file2", "hi world").build();
 
-        assertEquals(expectedFiles, cut.getChangedFiles());
+        assertEquals(expectedChanges, cut.getChanges());
         createNextCommit();
 
-        expectedFiles.clear();
-        expectedFiles.put("file1", "hello world\nhello worldhi world!\nhello hi");
-        expectedFiles.put("file2", "hi worldworld");
-        assertEquals(expectedFiles, cut.getChangedFiles());
-        assertEquals(Collections.emptyMap(), cut.getChangedFiles());
+        expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi worldworld").build();
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
 
         cut.closeGit();
     }
 
     @Test
-    public void testGetChangedFilesTagsOnly() throws GitAPIException, IOException {
+    public void testGetChangesTagsOnly() throws GitAPIException, IOException {
         cut.openGit();
         cut.env = Environment.PRODUCTION;
 
-        final Map<String, String> expectedFiles = new HashMap<>();
-        expectedFiles.put("file1", "hello world\nhello world");
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello world").build();
 
-        assertEquals(expectedFiles, cut.getChangedFiles());
-        assertEquals(Collections.emptyMap(), cut.getChangedFiles());
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
 
         createNextCommit();
 
-        expectedFiles.clear();
-        expectedFiles.put("file1", "hello world\nhello worldhi world!\nhello hi");
-        expectedFiles.put("file2", "hi world");
-        assertEquals(expectedFiles, cut.getChangedFiles());
+        expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi world").build();
+        assertEquals(expectedChanges, cut.getChanges());
 
         cut.closeGit();
+    }
+
+    @Test
+    public void testGetChangesRenamedEntry() throws IOException, GitAPIException {
+        cut.openGit();
+        createNextCommit();
+
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi worldworld").build();
+
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        renameFile();
+
+        expectedChanges = ChangeSetBuilder.withRemovedFiles("file2")
+                .andChangedFile("file3", "hi worldworld").build();
+        assertEquals(expectedChanges, cut.getChanges());
+
+        cut.closeGit();
+    }
+
+    @Test
+    public void testGetChangesDeletedEntry() throws IOException, GitAPIException {
+        cut.openGit();
+        createNextCommit();
+
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi worldworld").build();
+
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        deleteFile();
+
+        expectedChanges = ChangeSetBuilder.withRemovedFiles("file2").build();
+        assertEquals(expectedChanges, cut.getChanges());
+
+        cut.closeGit();
+    }
+
+    @Test
+    public void testGetChangesChangedAndRenamedEntry() throws IOException, GitAPIException {
+        cut.openGit();
+        createNextCommit();
+
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi worldworld").build();
+
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        changeAndRenameFile();
+
+        expectedChanges = ChangeSetBuilder.withRemovedFiles("file2")
+                .andChangedFile("file3", "hi worldworld\nchanged").build();
+        assertEquals(expectedChanges, cut.getChanges());
+
+        cut.closeGit();
+    }
+
+    private void changeAndRenameFile() throws IOException, GitAPIException {
+        final Git git = Git.open(gitCloneDirectory);
+        git.pull().setRemote("origin").setRemoteBranchName("master").call();
+
+        try (FileWriter writer = new FileWriter(file2, true)) {
+            writer.append("\nchanged");
+        }
+
+        if (!file2.renameTo(file2.toPath().resolveSibling("file3").toFile()))
+            throw new IOException("Could not rename file2 to file3");
+
+        git.add().setUpdate(true).addFilepattern(".").call();
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage("changed file2 and renamed to file3").call();
+        git.tag().setName("v0.3").call();
+        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.close();
     }
 
     @After
@@ -156,6 +246,35 @@ public class GitExtractorTest {
 
         git.push().setRemote("origin").add("master").setPushTags().call();
 
+        git.close();
+    }
+
+    private void renameFile() throws IOException, GitAPIException {
+        final Git git = Git.open(gitCloneDirectory);
+        git.pull().setRemote("origin").setRemoteBranchName("master").call();
+
+        if (!file2.renameTo(file2.toPath().resolveSibling("file3").toFile()))
+            throw new IOException("Could not rename file2 to file3");
+
+        git.add().setUpdate(true).addFilepattern(".").call();
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage("renamed file2 to file3").call();
+        git.tag().setName("v0.3").call();
+        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.close();
+    }
+
+    private void deleteFile() throws IOException, GitAPIException {
+        final Git git = Git.open(gitCloneDirectory);
+        git.pull().setRemote("origin").setRemoteBranchName("master").call();
+
+        if (!file2.delete())
+            throw new IOException("Could not delete file2");
+
+        git.add().setUpdate(true).addFilepattern(".").call();
+        git.commit().setMessage("deleted file2").call();
+        git.tag().setName("v0.3").call();
+        git.push().setRemote("origin").add("master").setPushTags().call();
         git.close();
     }
 

@@ -31,16 +31,10 @@ public class EntryCompiler {
      * The AsciiDoc ID of the abstract content blog.
      */
     private static final String ABSTRACT_CONTENT_ID = "abstract";
-    private static final String ASCIIDOC_SUFFIX = ".adoc";
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
 
-    public Entry compile(final String fileName, final String fileContent) {
-        if (!fileName.endsWith(ASCIIDOC_SUFFIX))
-            return null;
-
-        final String name = fileName.substring(0, fileName.length() - ASCIIDOC_SUFFIX.length());
-
+    public Entry compile(final String name, final String fileContent) {
         final DocumentHeader documentHeader = asciidoctor.readDocumentHeader(fileContent);
         final String headline = documentHeader.getDocumentTitle().getMain();
         final LocalDate date = LocalDate.parse(documentHeader.getRevisionInfo().getDate());

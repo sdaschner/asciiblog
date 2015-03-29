@@ -17,6 +17,7 @@
 package com.sebastian_daschner.asciiblog.business.source.control;
 
 import com.sebastian_daschner.asciiblog.business.environment.control.Environment;
+import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -53,9 +54,11 @@ public class GitExtractor {
     @Inject
     Environment env;
 
-    // TODO change to (remote) URL / SSH etc.
     @Inject
     File gitDirectory;
+
+    @Inject
+    NameNormalizer nameNormalizer;
 
     private Git git;
     private ObjectId lastCommit;
@@ -74,23 +77,23 @@ public class GitExtractor {
      *
      * @return The changed files with filename as key and content as value
      */
-    public Map<String, String> getChangedFiles() {
+    public ChangeSet getChanges() {
         ObjectId currentCommit = null;
         try {
             updateGit();
             currentCommit = getLatestCommit();
 
             if (currentCommit == null)
-                return Collections.emptyMap();
+                return new ChangeSet();
 
             if (lastCommit == null) {
-                return getChangedFiles(currentCommit);
+                return getChanges(currentCommit);
             }
 
-            return getChangedFiles(lastCommit, currentCommit);
+            return getChanges(lastCommit, currentCommit);
 
         } catch (IOException | GitAPIException e) {
-            return Collections.emptyMap();
+            return new ChangeSet();
         } finally {
             lastCommit = currentCommit;
         }
@@ -138,14 +141,18 @@ public class GitExtractor {
     /**
      * Returns the files which have been changed between the first commit and {@code commit}.
      */
-    private Map<String, String> getChangedFiles(final ObjectId commit) throws GitAPIException, IOException {
+    private ChangeSet getChanges(final ObjectId commit) throws GitAPIException, IOException {
         final RevWalk revWalk = new RevWalk(git.getRepository());
         try {
             final RevCommit revCommit = revWalk.parseCommit(commit);
 
             git.checkout().setName(revCommit.getName()).call();
 
-            return readFileContent(Stream.of(git.getRepository().getWorkTree().listFiles(File::isFile)).collect(Collectors.toSet()));
+            final Set<File> changedFiles = Stream.of(git.getRepository().getWorkTree().listFiles(File::isFile)).collect(Collectors.toSet());
+
+            final ChangeSet changes = new ChangeSet();
+            changes.getChangedFiles().putAll(readFileContent(changedFiles));
+            return changes;
         } finally {
             revWalk.dispose();
             git.checkout().setName(MASTER).call();
@@ -155,7 +162,7 @@ public class GitExtractor {
     /**
      * Returns the files which have been changed between {@code firstCommit} and {@code secondCommit}.
      */
-    private Map<String, String> getChangedFiles(final ObjectId firstCommit, final ObjectId secondCommit) throws GitAPIException, IOException {
+    private ChangeSet getChanges(final ObjectId firstCommit, final ObjectId secondCommit) throws GitAPIException, IOException {
         final List<DiffEntry> diffs = git.diff().setShowNameAndStatusOnly(true)
                 .setOldTree(prepareTreeParser(firstCommit))
                 .setNewTree(prepareTreeParser(secondCommit)).call();
@@ -166,7 +173,14 @@ public class GitExtractor {
                     .map(p -> Paths.get(git.getRepository().getWorkTree().getAbsolutePath(), p).toFile())
                     .filter(File::isFile).collect(Collectors.toSet());
 
-            return readFileContent(changedFiles);
+            final Set<String> removedFiles = diffs.stream()
+                    .filter(d -> d.getChangeType() == DiffEntry.ChangeType.DELETE || d.getChangeType() == DiffEntry.ChangeType.RENAME)
+                    .map(DiffEntry::getOldPath).map(nameNormalizer::normalize).collect(Collectors.toSet());
+
+            final ChangeSet changes = new ChangeSet();
+            changes.getChangedFiles().putAll(readFileContent(changedFiles));
+            changes.getRemovedFiles().addAll(removedFiles);
+            return changes;
         } finally {
             git.checkout().setName(MASTER).call();
         }
@@ -191,7 +205,7 @@ public class GitExtractor {
         return files.stream().collect(HashMap::new, (m, f) -> {
             try {
                 final String content = new String(Files.readAllBytes(f.toPath()));
-                m.put(f.getName(), content);
+                m.put(nameNormalizer.normalize(f.getName()), content);
             } catch (IOException e) {
                 // ignore file
             }

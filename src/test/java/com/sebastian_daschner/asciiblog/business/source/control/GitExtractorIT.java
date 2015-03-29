@@ -17,6 +17,7 @@
 package com.sebastian_daschner.asciiblog.business.source.control;
 
 import com.sebastian_daschner.asciiblog.business.environment.control.Environment;
+import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class GitExtractorIT {
     public void setUp() throws IOException, GitAPIException {
         cut = new GitExtractor();
         cut.gitDirectory = Paths.get("/home/asciiblog/source/").toFile();
+        cut.nameNormalizer = new NameNormalizer();
     }
 
     @Test
@@ -43,10 +45,10 @@ public class GitExtractorIT {
         cut.env = Environment.INTEGRATION;
         cut.openGit();
 
-        final Map<String, String> changedFiles = cut.getChangedFiles();
-        System.out.println("changedFiles = " + changedFiles.keySet());
-        assertFalse(changedFiles.isEmpty());
-        assertTrue(cut.getChangedFiles().isEmpty());
+        final ChangeSet changes = cut.getChanges();
+        System.out.println("changes = " + changes);
+        assertFalse(changes.getChangedFiles().isEmpty());
+        assertTrue(cut.getChanges().getChangedFiles().isEmpty());
 
         cut.closeGit();
     }
@@ -56,10 +58,10 @@ public class GitExtractorIT {
         cut.env = Environment.PRODUCTION;
         cut.openGit();
 
-        final Map<String, String> changedFiles = cut.getChangedFiles();
-        System.out.println("changedFiles = " + changedFiles.keySet());
-        assertFalse(changedFiles.isEmpty());
-        assertTrue(cut.getChangedFiles().isEmpty());
+        final ChangeSet changes = cut.getChanges();
+        System.out.println("changes = " + changes);
+        assertFalse(changes.getChangedFiles().isEmpty());
+        assertTrue(cut.getChanges().getChangedFiles().isEmpty());
 
         cut.closeGit();
     }

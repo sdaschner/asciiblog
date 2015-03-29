@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
-@Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class EntriesCache {
 
@@ -57,6 +56,10 @@ public class EntriesCache {
 
     public void store(final Entry entry) {
         entries.put(entry.getLink(), entry);
+    }
+
+    public void remove(final String name) {
+        entries.remove(name);
     }
 
 }

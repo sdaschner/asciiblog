@@ -88,7 +88,7 @@ public class EntryCompilerTest {
                 "\n" +
                 "https://github.com/sdaschner/jaxrs-analyzer[JAX-RS Analyzer]";
 
-        final Entry actualEntry = cut.compile("test.adoc", content);
+        final Entry actualEntry = cut.compile("test", content);
 
         assertEquals(expectedEntry, actualEntry);
     }
