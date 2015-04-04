@@ -16,9 +16,19 @@
 
 package com.sebastian_daschner.asciiblog.business.source.control;
 
-public class NameNormalizer {
+public class FileNameNormalizer {
 
     private static final String ASCIIDOC_SUFFIX = ".adoc";
+
+    /**
+     * Checks if the given file name should be considered for futher processing.
+     *
+     * @param fileName The file name to check
+     * @return {@code true} if relevant for further processing
+     */
+    public boolean isRelevant(final String fileName) {
+        return fileName.endsWith(ASCIIDOC_SUFFIX);
+    }
 
     /**
      * Removes the file suffix from the file names

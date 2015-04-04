@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +36,7 @@ public class GitExtractorIT {
     public void setUp() throws IOException, GitAPIException {
         cut = new GitExtractor();
         cut.gitDirectory = Paths.get("/home/asciiblog/source/").toFile();
-        cut.nameNormalizer = new NameNormalizer();
+        cut.fileNameNormalizer = new FileNameNormalizer();
     }
 
     @Test

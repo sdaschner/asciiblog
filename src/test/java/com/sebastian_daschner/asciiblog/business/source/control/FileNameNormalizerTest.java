@@ -19,15 +19,15 @@ package com.sebastian_daschner.asciiblog.business.source.control;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-public class NameNormalizerTest {
+public class FileNameNormalizerTest {
 
-    private NameNormalizer cut;
+    private FileNameNormalizer cut;
 
     @Before
     public void setUp() {
-        cut = new NameNormalizer();
+        cut = new FileNameNormalizer();
     }
 
     @Test
@@ -52,6 +52,21 @@ public class NameNormalizerTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNormalizeWrongSuffix() {
         cut.normalize("name.asciidoc");
+    }
+
+    @Test
+    public void testIsRelevantNormal() {
+        assertTrue(cut.isRelevant("name.adoc"));
+    }
+
+    @Test
+    public void testIsRelevantNonAdoc() {
+        assertFalse(cut.isRelevant("name.asciidoc"));
+    }
+
+    @Test
+    public void testIsRelevantNoSuffix() {
+        assertFalse(cut.isRelevant("name"));
     }
 
 }

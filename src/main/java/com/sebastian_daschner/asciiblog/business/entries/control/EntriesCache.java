@@ -21,7 +21,6 @@ import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
-import javax.ejb.Startup;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

@@ -24,7 +24,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
 
 public class GitExtractorTest {
 
@@ -46,15 +44,14 @@ public class GitExtractorTest {
     @Before
     public void setUp() throws IOException, GitAPIException {
         cut = new GitExtractor();
-        cut.nameNormalizer = Mockito.mock(NameNormalizer.class);
+        // assuming that normalizer works correct
+        cut.fileNameNormalizer = new FileNameNormalizer();
         cut.env = Environment.INTEGRATION;
         cut.gitDirectory = Files.createTempDirectory("git-blog-").toFile();
         gitCloneDirectory = Files.createTempDirectory("git-clone-").toFile();
-        file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1").toFile();
-        file2 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file2").toFile();
+        file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1.adoc").toFile();
+        file2 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file2.adoc").toFile();
 
-        // return the same file name as "normalized"
-        Mockito.when(cut.nameNormalizer.normalize(anyString())).then(i -> i.getArguments()[0]);
         initGitAndClone();
         addTestCommits();
     }
@@ -162,6 +159,22 @@ public class GitExtractorTest {
         cut.closeGit();
     }
 
+    @Test
+    public void testGetChangesIgnoreNonAsciiDocFiles() throws IOException, GitAPIException {
+        cut.openGit();
+        createNextCommit();
+        addNotRelevantFile();
+
+        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
+                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
+                .andChangedFile("file2", "hi worldworld").build();
+
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        cut.closeGit();
+    }
+
     private void changeAndRenameFile() throws IOException, GitAPIException {
         final Git git = Git.open(gitCloneDirectory);
         git.pull().setRemote("origin").setRemoteBranchName("master").call();
@@ -170,7 +183,7 @@ public class GitExtractorTest {
             writer.append("\nchanged");
         }
 
-        if (!file2.renameTo(file2.toPath().resolveSibling("file3").toFile()))
+        if (!file2.renameTo(file2.toPath().resolveSibling("file3.adoc").toFile()))
             throw new IOException("Could not rename file2 to file3");
 
         git.add().setUpdate(true).addFilepattern(".").call();
@@ -253,7 +266,7 @@ public class GitExtractorTest {
         final Git git = Git.open(gitCloneDirectory);
         git.pull().setRemote("origin").setRemoteBranchName("master").call();
 
-        if (!file2.renameTo(file2.toPath().resolveSibling("file3").toFile()))
+        if (!file2.renameTo(file2.toPath().resolveSibling("file3.adoc").toFile()))
             throw new IOException("Could not rename file2 to file3");
 
         git.add().setUpdate(true).addFilepattern(".").call();
@@ -275,6 +288,20 @@ public class GitExtractorTest {
         git.commit().setMessage("deleted file2").call();
         git.tag().setName("v0.3").call();
         git.push().setRemote("origin").add("master").setPushTags().call();
+        git.close();
+    }
+
+    private void addNotRelevantFile() throws GitAPIException, IOException {
+        final Git git = Git.open(gitCloneDirectory);
+        git.pull().setRemote("origin").setRemoteBranchName("master").call();
+
+        try (FileWriter writer = new FileWriter(file1.toPath().resolveSibling("foobar.mustache").toFile(), true)) {
+            writer.write("hello {{world}}");
+        }
+
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage("added template").call();
+        git.push().setRemote("origin").add("master").call();
         git.close();
     }
 

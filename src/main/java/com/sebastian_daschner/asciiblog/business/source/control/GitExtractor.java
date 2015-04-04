@@ -58,7 +58,7 @@ public class GitExtractor {
     File gitDirectory;
 
     @Inject
-    NameNormalizer nameNormalizer;
+    FileNameNormalizer fileNameNormalizer;
 
     private Git git;
     private ObjectId lastCommit;
@@ -175,7 +175,7 @@ public class GitExtractor {
 
             final Set<String> removedFiles = diffs.stream()
                     .filter(d -> d.getChangeType() == DiffEntry.ChangeType.DELETE || d.getChangeType() == DiffEntry.ChangeType.RENAME)
-                    .map(DiffEntry::getOldPath).map(nameNormalizer::normalize).collect(Collectors.toSet());
+                    .map(DiffEntry::getOldPath).map(fileNameNormalizer::normalize).collect(Collectors.toSet());
 
             final ChangeSet changes = new ChangeSet();
             changes.getChangedFiles().putAll(readFileContent(changedFiles));
@@ -202,10 +202,10 @@ public class GitExtractor {
     }
 
     private Map<String, String> readFileContent(final Set<File> files) {
-        return files.stream().collect(HashMap::new, (m, f) -> {
+        return files.stream().filter(f -> fileNameNormalizer.isRelevant(f.getName())).collect(HashMap::new, (m, f) -> {
             try {
                 final String content = new String(Files.readAllBytes(f.toPath()));
-                m.put(nameNormalizer.normalize(f.getName()), content);
+                m.put(fileNameNormalizer.normalize(f.getName()), content);
             } catch (IOException e) {
                 // ignore file
             }
