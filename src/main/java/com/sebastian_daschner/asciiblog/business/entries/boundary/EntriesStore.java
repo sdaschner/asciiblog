@@ -18,9 +18,12 @@ package com.sebastian_daschner.asciiblog.business.entries.boundary;
 
 import com.sebastian_daschner.asciiblog.business.entries.control.EntriesCache;
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
+import com.sebastian_daschner.asciiblog.business.statistics.entity.EntryAccess;
 
 import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.List;
 
 @Stateless
@@ -31,6 +34,9 @@ public class EntriesStore {
     @Inject
     EntriesCache cache;
 
+    @Inject
+    Event<EntryAccess> accessEvents;
+
     public List<Entry> getTeaserEntries() {
         return cache.getLastEntries(NUMBER_TEASERS);
     }
@@ -40,6 +46,7 @@ public class EntriesStore {
     }
 
     public Entry getEntry(final String name) {
+        accessEvents.fire(new EntryAccess(name, Instant.now()));
         return cache.get(name);
     }
 
