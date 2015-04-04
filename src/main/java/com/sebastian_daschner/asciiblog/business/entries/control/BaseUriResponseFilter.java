@@ -44,7 +44,6 @@ public class BaseUriResponseFilter implements ContainerResponseFilter {
 
         // add base URI to model
         final View view = (View) responseContext.getEntity();
-        System.out.println("adding " + homeUri + " to model");
         view.getModel().put("homeUri", homeUri);
     }
 
