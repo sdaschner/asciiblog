@@ -13,3 +13,8 @@ When deploying on Wildfly, the `servlet-container` configuration has to be set t
 for allowing the View message body writer to forward the request to a JSP view.
 
 For a full description see http://blog.sebastian-daschner.com/entries/blog_with_asciidoc_update[Blog written in AsciiDoc].
+
+The latest version comes with JavaEE 8 MVC (JSR 371) support. This runs on Ozark and currently has to be deployed on a Glassfish nightly build.
+See http://blog.sebastian-daschner.com/entries/asciiblog_on_mvc[AsciiBlog on JavaEE 8 MVC].
+
+The application is deployed under http://blog.sebastian-daschner.com.
