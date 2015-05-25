@@ -17,43 +17,42 @@
 package com.sebastian_daschner.asciiblog.business.entries.boundary;
 
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
-import com.sebastian_daschner.asciiblog.business.views.entity.View;
 
-import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.mvc.Controller;
+import javax.mvc.Models;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
+import javax.ws.rs.PathParam;
 import java.util.List;
-import java.util.Map;
 
-@Stateless
-@Path("/")
-@Produces(MediaType.TEXT_HTML)
-public class RootResource {
-
-    @Context
-    ResourceContext rc;
+@Controller
+public class EntriesController {
 
     @Inject
     EntriesStore entriesStore;
 
-    @GET
-    public View index() {
-        final Map<String, Object> model = new HashMap<>();
-        final List<Entry> teaserEntries = entriesStore.getTeaserEntries();
-        model.put("entries", teaserEntries);
+    @Inject
+    Models models;
 
-        return new View("index", model);
+    @GET
+    public String getAllEntries() {
+        final List<Entry> entries = entriesStore.getAllEntries();
+        models.put("entries", entries);
+
+        return "entries.jsp";
     }
 
-    @Path("entries")
-    public EntriesResource entries() {
-        return rc.getResource(EntriesResource.class);
+    @GET
+    @Path("{entry}")
+    public String getEntry(@PathParam("entry") final String entryName) {
+        final Entry entry = entriesStore.getEntry(entryName);
+
+        if (entry == null)
+            return "notFound.jsp";
+
+        models.put("entry", entry);
+        return "entry.jsp";
     }
 
 }

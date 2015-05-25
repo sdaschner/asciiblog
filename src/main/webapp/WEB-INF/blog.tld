@@ -4,6 +4,7 @@
     <tlib-version>1.0</tlib-version>
     <jsp-version>2.0</jsp-version>
     <short-name>AsciiBlog TLD</short-name>
+    <uri>/WEB-INF/blog</uri>
     <tag>
         <name>formatDate</name>
         <tag-class>com.sebastian_daschner.asciiblog.presentation.dates.FormatDateTag</tag-class>

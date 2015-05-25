@@ -17,42 +17,40 @@
 package com.sebastian_daschner.asciiblog.business.entries.boundary;
 
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
-import com.sebastian_daschner.asciiblog.business.views.entity.View;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
+import javax.mvc.Controller;
+import javax.mvc.Models;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
 import java.util.List;
-import java.util.Map;
 
-@Produces(MediaType.TEXT_HTML)
-public class EntriesResource {
+@Path("/")
+public class RootController {
+
+    @Context
+    ResourceContext rc;
 
     @Inject
     EntriesStore entriesStore;
 
-    @GET
-    public View getAllEntries() {
-        final List<Entry> entries = entriesStore.getAllEntries();
-        final Map<String, Object> model = new HashMap<>();
-        model.put("entries", entries);
+    @Inject
+    Models models;
 
-        return new View("entries", model);
+    @Controller
+    @GET
+    public String index() {
+        final List<Entry> teaserEntries = entriesStore.getTeaserEntries();
+
+        models.put("entries", teaserEntries);
+        return "index.jsp";
     }
 
-    @GET
-    @Path("{entry}")
-    public View getEntry(@PathParam("entry") final String entryName) {
-        final Entry entry = entriesStore.getEntry(entryName);
-
-        if (entry == null)
-            throw new NotFoundException();
-
-        final Map<String, Object> model = new HashMap<>();
-        model.put("entry", entry);
-
-        return new View("entry", model);
+    @Path("entries")
+    public EntriesController entries() {
+        return rc.getResource(EntriesController.class);
     }
 
 }
