@@ -31,7 +31,8 @@ public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(final Exception exception) {
         // due to https://java.net/jira/browse/OZARK-42 the entity is left empty to produce an empty output
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("").build();
+        // TODO change to view as soon as 1.0.0-m02 version is released
+        return Response.status(Response.Status.NOT_FOUND).entity("").build();
     }
 
 }
