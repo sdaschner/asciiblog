@@ -16,9 +16,8 @@
 
 package com.sebastian_daschner.asciiblog.business.entries.control;
 
-import com.sebastian_daschner.asciiblog.business.views.entity.View;
-
 import javax.inject.Inject;
+import javax.mvc.Models;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -37,14 +36,13 @@ public class BaseUriResponseFilter implements ContainerResponseFilter {
     @Inject
     URI homeUri;
 
+    @Inject
+    Models models;
+
     @Override
     public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
-        if (responseContext.getEntity() == null || !View.class.isAssignableFrom(responseContext.getEntityClass()))
-            return;
-
         // add base URI to model
-        final View view = (View) responseContext.getEntity();
-        view.getModel().put("homeUri", homeUri);
+        models.put("homeUri", homeUri);
     }
 
 }
