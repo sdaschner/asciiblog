@@ -40,59 +40,10 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <finalName>asciiblog</finalName>
-
-        <plugins>
-            <plugin>
-                <groupId>com.sebastian-daschner</groupId>
-                <artifactId>tests-maven-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <greeting>Hi</greeting>
-                            <name>Sebastian</name>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.sebastian-daschner</groupId>
-                <artifactId>jaxrs-analyzer-maven-plugin</artifactId>
-                <version>0.9-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>analyze-jaxrs</goal>
-                        </goals>
-                        <configuration>
-                            <deployedDomain>example.com</deployedDomain>
-                            <backend>swagger</backend>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
     </build>
-
-    <!--<pluginRepositories>-->
-    <!--<pluginRepository>-->
-    <!--<id>ossrh-snapshots</id>-->
-    <!--<url>https://oss.sonatype.org/content/repositories/snapshots/</url>-->
-    <!--<releases>-->
-    <!--<enabled>false</enabled>-->
-    <!--</releases>-->
-    <!--<snapshots>-->
-    <!--<enabled>true</enabled>-->
-    <!--</snapshots>-->
-    <!--</pluginRepository>-->
-    <!--</pluginRepositories>-->
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
