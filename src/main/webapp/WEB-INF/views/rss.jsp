@@ -13,7 +13,7 @@
         <atom:link href="https://blog.sebastian-daschner.com/feeds/rss" rel="self" type="application/rss+xml" />
         <c:forEach var="entry" items="${entries}">
             <item>
-                <title>${entry.title}</title>
+                <title><c:out value="${entry.title}" /></title>
                 <description><c:out value="${entry.abstractContent}" /></description>
                 <link>https://blog.sebastian-daschner.com/entries/${entry.link}</link>
                 <guid isPermaLink="true">https://blog.sebastian-daschner.com/entries/${entry.link}</guid>
