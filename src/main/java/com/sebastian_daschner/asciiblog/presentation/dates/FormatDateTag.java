@@ -21,27 +21,38 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * Formats a {@link LocalDate} to a readable String representation.
+ * Formats a {@link LocalDate} to a String representation.
  *
  * @author Sebastian Daschner
  */
 public class FormatDateTag extends SimpleTagSupport {
 
     private LocalDate value;
+    private boolean rfc1123;
 
     @Override
     public void doTag() throws JspException, IOException {
-        final String format = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH).format(value).toLowerCase();
+        final String format;
+        if (rfc1123)
+            format = DateTimeFormatter.RFC_1123_DATE_TIME.format(value.atStartOfDay(ZoneOffset.UTC));
+        else
+            format = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH).format(value).toLowerCase();
+
         JspWriter out = getJspContext().getOut();
-        out.println(format);
+        out.print(format);
     }
 
     public void setValue(final LocalDate value) {
         this.value = value;
+    }
+
+    public void setRfc1123(final boolean rfc1123) {
+        this.rfc1123 = rfc1123;
     }
 
 }

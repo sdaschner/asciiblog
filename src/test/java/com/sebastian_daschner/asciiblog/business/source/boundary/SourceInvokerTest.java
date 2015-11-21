@@ -16,7 +16,7 @@
 
 package com.sebastian_daschner.asciiblog.business.source.boundary;
 
-import com.sebastian_daschner.asciiblog.business.entries.control.EntriesCache;
+import com.sebastian_daschner.asciiblog.business.entries.control.EntryCache;
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import com.sebastian_daschner.asciiblog.business.source.control.EntryCompiler;
 import com.sebastian_daschner.asciiblog.business.source.control.GitExtractor;
@@ -43,7 +43,7 @@ public class SourceInvokerTest {
         cut = new SourceInvoker();
         cut.gitExtractor = Mockito.mock(GitExtractor.class);
         cut.entryCompiler = Mockito.mock(EntryCompiler.class);
-        cut.cache = Mockito.mock(EntriesCache.class);
+        cut.cache = Mockito.mock(EntryCache.class);
     }
 
     @Test

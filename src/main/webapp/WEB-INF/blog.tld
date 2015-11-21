@@ -15,5 +15,11 @@
             <type>java.time.LocalDate</type>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+        <attribute>
+            <name>rfc1123</name>
+            <required>false</required>
+            <type>boolean</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
     </tag>
 </taglib>

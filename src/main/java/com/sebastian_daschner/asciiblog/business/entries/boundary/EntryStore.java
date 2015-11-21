@@ -16,7 +16,7 @@
 
 package com.sebastian_daschner.asciiblog.business.entries.boundary;
 
-import com.sebastian_daschner.asciiblog.business.entries.control.EntriesCache;
+import com.sebastian_daschner.asciiblog.business.entries.control.EntryCache;
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import com.sebastian_daschner.asciiblog.business.statistics.entity.EntryAccess;
 
@@ -27,12 +27,12 @@ import java.time.Instant;
 import java.util.List;
 
 @Stateless
-public class EntriesStore {
+public class EntryStore {
 
     private static final int NUMBER_TEASERS = 6;
 
     @Inject
-    EntriesCache cache;
+    EntryCache cache;
 
     @Inject
     Event<EntryAccess> accessEvents;

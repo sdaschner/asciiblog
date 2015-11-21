@@ -23,11 +23,13 @@ import javax.mvc.Controller;
 import javax.mvc.Models;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-public class EntriesController {
+public class FeedsController {
 
     @Inject
     EntryStore entryStore;
@@ -36,23 +38,16 @@ public class EntriesController {
     Models models;
 
     @GET
-    public String getAllEntries() {
-        final List<Entry> entries = entryStore.getAllEntries();
-        models.put("entries", entries);
+    @Produces(MediaType.APPLICATION_XML)
+    @Path("rss")
+    public String rss() {
+        final List<Entry> teaserEntries = entryStore.getTeaserEntries();
+        final LocalDate latestDate = teaserEntries.isEmpty() ? LocalDate.now() : teaserEntries.get(0).getDate();
 
-        return "entries.jsp";
-    }
+        models.put("entries", teaserEntries);
+        models.put("latestDate", latestDate);
 
-    @GET
-    @Path("{entry}")
-    public String getEntry(@PathParam("entry") final String entryName) {
-        final Entry entry = entryStore.getEntry(entryName);
-
-        if (entry == null)
-            return "notFound.jsp";
-
-        models.put("entry", entry);
-        return "entry.jsp";
+        return "rss.jsp";
     }
 
 }

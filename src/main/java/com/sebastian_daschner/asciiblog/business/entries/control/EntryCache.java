@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class EntriesCache {
+public class EntryCache {
 
     /**
      * The blog entries identified by the entry name.

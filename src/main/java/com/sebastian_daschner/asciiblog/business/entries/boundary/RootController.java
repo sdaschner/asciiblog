@@ -23,10 +23,13 @@ import javax.mvc.Controller;
 import javax.mvc.Models;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
+import java.time.LocalDate;
 import java.util.List;
 
+@Controller
 @Path("/")
 public class RootController {
 
@@ -34,18 +37,22 @@ public class RootController {
     ResourceContext rc;
 
     @Inject
-    EntriesStore entriesStore;
+    EntryStore entryStore;
 
     @Inject
     Models models;
 
-    @Controller
     @GET
     public String index() {
-        final List<Entry> teaserEntries = entriesStore.getTeaserEntries();
+        final List<Entry> teaserEntries = entryStore.getTeaserEntries();
 
         models.put("entries", teaserEntries);
         return "index.jsp";
+    }
+
+    @Path("feeds")
+    public FeedsController feeds() {
+        return rc.getResource(FeedsController.class);
     }
 
     @Path("entries")

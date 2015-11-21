@@ -16,7 +16,7 @@
 
 package com.sebastian_daschner.asciiblog.business.source.boundary;
 
-import com.sebastian_daschner.asciiblog.business.entries.control.EntriesCache;
+import com.sebastian_daschner.asciiblog.business.entries.control.EntryCache;
 import com.sebastian_daschner.asciiblog.business.source.control.EntryCompiler;
 import com.sebastian_daschner.asciiblog.business.source.control.GitExtractor;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
@@ -39,7 +39,7 @@ public class SourceInvoker {
     EntryCompiler entryCompiler;
 
     @Inject
-    EntriesCache cache;
+    EntryCache cache;
 
     @PostConstruct
     @Schedule(second = "0", minute = "*", hour = "*")
