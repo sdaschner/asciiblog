@@ -39,6 +39,7 @@ import javax.ejb.Startup;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -204,7 +205,7 @@ public class GitExtractor {
     private Map<String, String> readFileContent(final Set<File> files) {
         return files.stream().filter(f -> fileNameNormalizer.isRelevant(f.getName())).collect(HashMap::new, (m, f) -> {
             try {
-                final String content = new String(Files.readAllBytes(f.toPath()));
+                final String content = new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
                 m.put(fileNameNormalizer.normalize(f.getName()), content);
             } catch (IOException e) {
                 // ignore file
