@@ -27,6 +27,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @Singleton
 @Startup
@@ -41,16 +42,26 @@ public class SourceInvoker {
     @Inject
     EntryCache cache;
 
+    @Inject
+    Logger logger;
+
     @PostConstruct
-    @Schedule(second = "0", minute = "*", hour = "*")
+    @Schedule(minute = "*", hour = "*")
+    // TODO add REST resource to invoke this method
     public void checkNewEntries() {
         final ChangeSet changes = gitExtractor.getChanges();
 
         changes.getChangedFiles().entrySet().stream()
                 .map(e -> entryCompiler.compile(e.getKey(), e.getValue())).filter(Objects::nonNull)
-                .forEach(cache::store);
+                .forEach(e -> {
+                    cache.store(e);
+                    logger.info("Added entry " + e.getLink());
+                });
 
-        changes.getRemovedFiles().forEach(cache::remove);
+        changes.getRemovedFiles().forEach(e -> {
+            cache.remove(e);
+            logger.info("Removed entry " + e);
+        });
     }
 
 }

@@ -17,16 +17,13 @@
 package com.sebastian_daschner.asciiblog.business.environment.control;
 
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 public class EnvironmentDataProvider {
-
-    @Produces
-    public Environment getEnvironment() {
-        return Environment.valueOf(System.getProperty("blog.environment", "INTEGRATION"));
-    }
 
     @Produces
     public File getGitLocation() {
@@ -36,6 +33,11 @@ public class EnvironmentDataProvider {
     @Produces
     public URI getHomeUri() {
         return URI.create(System.getProperty("blog.uri.home"));
+    }
+
+    @Produces
+    public Logger getLogger(InjectionPoint injectionPoint) {
+        return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
     }
 
 }

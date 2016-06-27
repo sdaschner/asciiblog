@@ -28,7 +28,14 @@ import java.util.Set;
  */
 public class ChangeSet {
 
+    /**
+     * The changed (incl. new) file names with their content.
+     */
     private final Map<String, String> changedFiles = new HashMap<>();
+
+    /**
+     * The removed file names.
+     */
     private final Set<String> removedFiles = new HashSet<>();
 
     public Map<String, String> getChangedFiles() {

@@ -16,7 +16,6 @@
 
 package com.sebastian_daschner.asciiblog.business.source.control;
 
-import com.sebastian_daschner.asciiblog.business.environment.control.Environment;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSetBuilder;
 import org.eclipse.jgit.api.Git;
@@ -26,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +44,6 @@ public class GitExtractorTest {
         cut = new GitExtractor();
         // assuming that normalizer works correct
         cut.fileNameNormalizer = new FileNameNormalizer();
-        cut.env = Environment.INTEGRATION;
         cut.gitDirectory = Files.createTempDirectory("git-blog-").toFile();
         gitCloneDirectory = Files.createTempDirectory("git-clone-").toFile();
         file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1.adoc").toFile();
@@ -65,6 +62,7 @@ public class GitExtractorTest {
                 .andChangedFile("file2", "hi world").build();
 
         assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
         createNextCommit();
 
         expectedChanges = ChangeSetBuilder.withRemovedFiles()
@@ -72,27 +70,6 @@ public class GitExtractorTest {
                 .andChangedFile("file2", "hi worldworld").build();
         assertEquals(expectedChanges, cut.getChanges());
         assertEquals(new ChangeSet(), cut.getChanges());
-
-        cut.closeGit();
-    }
-
-    @Test
-    public void testGetChangesTagsOnly() throws GitAPIException, IOException {
-        cut.openGit();
-        cut.env = Environment.PRODUCTION;
-
-        ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
-                .andChangedFile("file1", "hello world\nhello world").build();
-
-        assertEquals(expectedChanges, cut.getChanges());
-        assertEquals(new ChangeSet(), cut.getChanges());
-
-        createNextCommit();
-
-        expectedChanges = ChangeSetBuilder.withRemovedFiles()
-                .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
-                .andChangedFile("file2", "hi world").build();
-        assertEquals(expectedChanges, cut.getChanges());
 
         cut.closeGit();
     }
@@ -114,6 +91,7 @@ public class GitExtractorTest {
         expectedChanges = ChangeSetBuilder.withRemovedFiles("file2")
                 .andChangedFile("file3", "hi worldworld").build();
         assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
 
         cut.closeGit();
     }
@@ -134,6 +112,7 @@ public class GitExtractorTest {
 
         expectedChanges = ChangeSetBuilder.withRemovedFiles("file2").build();
         assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
 
         cut.closeGit();
     }
@@ -155,6 +134,7 @@ public class GitExtractorTest {
         expectedChanges = ChangeSetBuilder.withRemovedFiles("file2")
                 .andChangedFile("file3", "hi worldworld\nchanged").build();
         assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
 
         cut.closeGit();
     }
@@ -163,12 +143,23 @@ public class GitExtractorTest {
     public void testGetChangesIgnoreNonAsciiDocFiles() throws IOException, GitAPIException {
         cut.openGit();
         createNextCommit();
-        addNotRelevantFile();
+        addNotRelevantFile("foobar");
 
         ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
                 .andChangedFile("file1", "hello world\nhello worldhi world!\nhello hi")
                 .andChangedFile("file2", "hi worldworld").build();
 
+        assertEquals(expectedChanges, cut.getChanges());
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        addNotRelevantFile("foobar2");
+        assertEquals(new ChangeSet(), cut.getChanges());
+
+        addNotRelevantFile("foobar3");
+        renameFile();
+
+        expectedChanges = ChangeSetBuilder.withRemovedFiles("file2")
+                .andChangedFile("file3", "hi worldworld").build();
         assertEquals(expectedChanges, cut.getChanges());
         assertEquals(new ChangeSet(), cut.getChanges());
 
@@ -189,8 +180,7 @@ public class GitExtractorTest {
         git.add().setUpdate(true).addFilepattern(".").call();
         git.add().addFilepattern(".").call();
         git.commit().setMessage("changed file2 and renamed to file3").call();
-        git.tag().setName("v0.3").call();
-        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.push().setRemote("origin").add("master").call();
         git.close();
     }
 
@@ -201,12 +191,13 @@ public class GitExtractorTest {
     }
 
     private static void delete(final File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles())
+        final File[] files;
+        if (f.isDirectory() && (files = f.listFiles()) != null)
+            for (File c : files)
                 delete(c);
-        }
+
         if (!f.delete())
-            throw new FileNotFoundException("Failed to delete file: " + f);
+            throw new IOException("Failed to delete file: " + f);
     }
 
     private void initGitAndClone() throws GitAPIException {
@@ -228,14 +219,13 @@ public class GitExtractorTest {
         }
         git.add().addFilepattern(".").call();
         git.commit().setMessage("updated").call();
-        git.tag().setName("v0.1").call();
 
         try (FileWriter writer = new FileWriter(file2, true)) {
             writer.write("hi world");
         }
         git.add().addFilepattern(".").call();
         git.commit().setMessage("updated").call();
-        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.push().setRemote("origin").add("master").call();
 
         git.close();
     }
@@ -249,7 +239,6 @@ public class GitExtractorTest {
         }
         git.add().addFilepattern(".").call();
         git.commit().setMessage("updated file1").call();
-        git.tag().setName("v0.2").call();
 
         try (FileWriter writer = new FileWriter(file2, true)) {
             writer.write("world");
@@ -257,7 +246,7 @@ public class GitExtractorTest {
         git.add().addFilepattern(".").call();
         git.commit().setMessage("updated file2").call();
 
-        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.push().setRemote("origin").add("master").call();
 
         git.close();
     }
@@ -272,8 +261,7 @@ public class GitExtractorTest {
         git.add().setUpdate(true).addFilepattern(".").call();
         git.add().addFilepattern(".").call();
         git.commit().setMessage("renamed file2 to file3").call();
-        git.tag().setName("v0.3").call();
-        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.push().setRemote("origin").add("master").call();
         git.close();
     }
 
@@ -286,16 +274,15 @@ public class GitExtractorTest {
 
         git.add().setUpdate(true).addFilepattern(".").call();
         git.commit().setMessage("deleted file2").call();
-        git.tag().setName("v0.3").call();
-        git.push().setRemote("origin").add("master").setPushTags().call();
+        git.push().setRemote("origin").add("master").call();
         git.close();
     }
 
-    private void addNotRelevantFile() throws GitAPIException, IOException {
+    private void addNotRelevantFile(final String fileName) throws GitAPIException, IOException {
         final Git git = Git.open(gitCloneDirectory);
         git.pull().setRemote("origin").setRemoteBranchName("master").call();
 
-        try (FileWriter writer = new FileWriter(file1.toPath().resolveSibling("foobar.mustache").toFile(), true)) {
+        try (FileWriter writer = new FileWriter(file1.toPath().resolveSibling(fileName + ".mustache").toFile(), true)) {
             writer.write("hello {{world}}");
         }
 

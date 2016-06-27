@@ -54,10 +54,10 @@ public class StatisticsTest {
     private Map<String, Set<Instant>> testCacheData() {
         final Map<String, Set<Instant>> data = new HashMap<>();
 
-        final Instant firstTimestamp = Instant.ofEpochSecond(1l);
-        final Instant secondTimestamp = Instant.ofEpochSecond(2l);
-        final Instant thirdTimestamp = Instant.ofEpochSecond(3l);
-        final Instant fourthTimestamp = Instant.ofEpochSecond(4l);
+        final Instant firstTimestamp = Instant.ofEpochSecond(1L);
+        final Instant secondTimestamp = Instant.ofEpochSecond(2L);
+        final Instant thirdTimestamp = Instant.ofEpochSecond(3L);
+        final Instant fourthTimestamp = Instant.ofEpochSecond(4L);
 
         data.put("first", new HashSet<>(Arrays.asList(firstTimestamp, secondTimestamp, thirdTimestamp, fourthTimestamp)));
         return data;

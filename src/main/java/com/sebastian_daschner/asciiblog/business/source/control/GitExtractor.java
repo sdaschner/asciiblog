@@ -16,17 +16,13 @@
 
 package com.sebastian_daschner.asciiblog.business.source.control;
 
-import com.sebastian_daschner.asciiblog.business.environment.control.Environment;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevObject;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
@@ -42,7 +38,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,9 +50,6 @@ import static org.eclipse.jgit.lib.Constants.MASTER;
 @Startup
 @Singleton
 public class GitExtractor {
-
-    @Inject
-    Environment env;
 
     @Inject
     File gitDirectory;
@@ -73,10 +69,25 @@ public class GitExtractor {
         }
     }
 
+    @PreDestroy
+    public void closeGit() {
+        final File directory = git.getRepository().getWorkTree();
+        git.close();
+        delete(directory);
+    }
+
+    private void delete(final File file) {
+        final File[] files;
+        if (file.isDirectory() && (files = file.listFiles()) != null)
+            Stream.of(files).forEach(this::delete);
+        if (!file.delete())
+            throw new IllegalStateException("Could not delete file: " + file);
+    }
+
     /**
-     * Returns the files which have been changed since the last call.
-     *
-     * @return The changed files with filename as key and content as value
+     * Returns the AsciiDoc files which have been changed since the last call.
+     * <p>
+     * <b>Note:</b> Only relevant AsciiDoc files are included.
      */
     public ChangeSet getChanges() {
         ObjectId currentCommit = null;
@@ -105,42 +116,11 @@ public class GitExtractor {
     }
 
     private ObjectId getLatestCommit() throws IOException {
-        final boolean tagsOnly = env == Environment.PRODUCTION;
-        final Repository repository = git.getRepository();
-
-        final ObjectId currentHead = repository.resolve(MASTER);
-        if (!tagsOnly)
-            return currentHead;
-
-        final RevWalk revWalk = new RevWalk(repository);
-
-        try {
-            final Set<ObjectId> tagCommitIds = repository.getTags().values().stream()
-                    .map(Ref::getLeaf).map(Ref::getObjectId).map(id -> {
-                        try {
-                            return revWalk.parseCommit(id);
-                        } catch (IOException e) {
-                            return null;
-                        }
-                    }).filter(Objects::nonNull)
-                    .map(RevObject::getId)
-                    .collect(Collectors.toSet());
-
-            revWalk.markStart(revWalk.parseCommit(currentHead));
-
-            for (final RevCommit currentCommit : revWalk) {
-                if (tagCommitIds.contains(currentCommit.getId()))
-                    return currentCommit.getId();
-            }
-
-        } finally {
-            revWalk.dispose();
-        }
-        return null;
+        return git.getRepository().resolve(MASTER);
     }
 
     /**
-     * Returns the files which have been changed between the first commit and {@code commit}.
+     * Returns a change set with all files which exist at {@code commit}.
      */
     private ChangeSet getChanges(final ObjectId commit) throws GitAPIException, IOException {
         final RevWalk revWalk = new RevWalk(git.getRepository());
@@ -149,14 +129,16 @@ public class GitExtractor {
 
             git.checkout().setName(revCommit.getName()).call();
 
-            final Set<File> changedFiles = Stream.of(git.getRepository().getWorkTree().listFiles(File::isFile)).collect(Collectors.toSet());
+            final Set<File> changedFiles = Stream.of(git.getRepository().getWorkTree()
+                    .listFiles(f -> f.isFile() && fileNameNormalizer.isRelevant(f.getName())))
+                    .collect(Collectors.toSet());
 
             final ChangeSet changes = new ChangeSet();
             changes.getChangedFiles().putAll(readFileContent(changedFiles));
             return changes;
         } finally {
             revWalk.dispose();
-            git.checkout().setName(MASTER).call();
+            resetGit();
         }
     }
 
@@ -171,6 +153,7 @@ public class GitExtractor {
             git.checkout().setName(secondCommit.getName()).call();
 
             final Set<File> changedFiles = diffs.stream().map(DiffEntry::getNewPath).distinct()
+                    .filter(fileNameNormalizer::isRelevant)
                     .map(p -> Paths.get(git.getRepository().getWorkTree().getAbsolutePath(), p).toFile())
                     .filter(File::isFile).collect(Collectors.toSet());
 
@@ -183,7 +166,7 @@ public class GitExtractor {
             changes.getRemovedFiles().addAll(removedFiles);
             return changes;
         } finally {
-            git.checkout().setName(MASTER).call();
+            resetGit();
         }
     }
 
@@ -202,29 +185,23 @@ public class GitExtractor {
         return treeParser;
     }
 
+    private void resetGit() throws GitAPIException {
+        git.checkout().setName(MASTER).call();
+    }
+
     private Map<String, String> readFileContent(final Set<File> files) {
-        return files.stream().filter(f -> fileNameNormalizer.isRelevant(f.getName())).collect(HashMap::new, (m, f) -> {
+        final Map<String, String> fileContent = new HashMap<>();
+
+        files.forEach(f -> {
             try {
                 final String content = new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
-                m.put(fileNameNormalizer.normalize(f.getName()), content);
+                fileContent.put(fileNameNormalizer.normalize(f.getName()), content);
             } catch (IOException e) {
-                // ignore file
+                throw new RuntimeException("Could not read AsciiDoc file content", e);
             }
-        }, Map::putAll);
-    }
+        });
 
-    @PreDestroy
-    public void closeGit() {
-        final File directory = git.getRepository().getWorkTree();
-        git.close();
-        delete(directory);
-    }
-
-    private void delete(final File file) {
-        if (file.isDirectory())
-            Stream.of(file.listFiles()).forEach(this::delete);
-        if (!file.delete())
-            throw new IllegalStateException("Could not delete file: " + file);
+        return fileContent;
     }
 
 }

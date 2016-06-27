@@ -22,8 +22,11 @@ import org.asciidoctor.OptionsBuilder;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.ast.StructuredDocument;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EntryCompiler {
 
@@ -34,17 +37,25 @@ public class EntryCompiler {
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
 
+    @Inject
+    Logger logger;
+
     public Entry compile(final String name, final String fileContent) {
-        final DocumentHeader documentHeader = asciidoctor.readDocumentHeader(fileContent);
-        final String headline = documentHeader.getDocumentTitle().getMain();
-        final LocalDate date = LocalDate.parse(documentHeader.getRevisionInfo().getDate());
+        try {
+            final DocumentHeader documentHeader = asciidoctor.readDocumentHeader(fileContent);
+            final String headline = documentHeader.getDocumentTitle().getMain();
+            final LocalDate date = LocalDate.parse(documentHeader.getRevisionInfo().getDate());
 
-        final StructuredDocument structuredDocument = asciidoctor.readDocumentStructure(fileContent, new HashMap<>());
-        final String abstractContent = structuredDocument.getPartById(ABSTRACT_CONTENT_ID).getContent();
+            final StructuredDocument structuredDocument = asciidoctor.readDocumentStructure(fileContent, new HashMap<>());
+            final String abstractContent = structuredDocument.getPartById(ABSTRACT_CONTENT_ID).getContent();
 
-        final String content = asciidoctor.convert(fileContent, OptionsBuilder.options().toFile(false));
+            final String content = asciidoctor.convert(fileContent, OptionsBuilder.options().toFile(false));
 
-        return new Entry(name, headline, date, abstractContent, content);
+            return new Entry(name, headline, date, abstractContent, content);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not compile entry " + name, e);
+            return null;
+        }
     }
 
 }

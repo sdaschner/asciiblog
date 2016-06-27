@@ -37,14 +37,14 @@ public class EntryCache {
     private final Map<String, Entry> entries = new ConcurrentHashMap<>();
 
     public List<Entry> getLastEntries(final int number) {
-        return entries.values().parallelStream()
+        return entries.values().stream()
                 .sorted(Comparator.comparing(Entry::getDate).reversed())
                 .limit(number)
                 .collect(Collectors.toList());
     }
 
     public List<Entry> getAllEntries() {
-        return entries.values().parallelStream()
+        return entries.values().stream()
                 .sorted(Comparator.comparing(Entry::getDate).reversed())
                 .collect(Collectors.toList());
     }

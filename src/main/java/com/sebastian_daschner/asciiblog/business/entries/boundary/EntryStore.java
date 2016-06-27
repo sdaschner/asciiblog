@@ -46,8 +46,12 @@ public class EntryStore {
     }
 
     public Entry getEntry(final String name) {
-        accessEvents.fire(new EntryAccess(name, Instant.now()));
-        return cache.get(name);
+        final Entry entry = cache.get(name);
+
+        if (entry != null)
+            accessEvents.fire(new EntryAccess(name, Instant.now()));
+
+        return entry;
     }
 
 }
