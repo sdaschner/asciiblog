@@ -21,7 +21,7 @@ import com.sebastian_daschner.asciiblog.business.source.control.EntryCompiler;
 import com.sebastian_daschner.asciiblog.business.source.control.GitExtractor;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 
-import javax.annotation.PostConstruct;
+import javax.ejb.Asynchronous;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -45,9 +45,8 @@ public class SourceInvoker {
     @Inject
     Logger logger;
 
-    @PostConstruct
-    @Schedule(minute = "*", hour = "*")
-    // TODO add REST resource to invoke this method
+    @Asynchronous
+    @Schedule(minute = "*/10", hour = "*")
     public void checkNewEntries() {
         final ChangeSet changes = gitExtractor.getChanges();
 

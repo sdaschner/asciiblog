@@ -26,8 +26,15 @@ import java.util.logging.Logger;
 public class EnvironmentDataProvider {
 
     @Produces
+    @FileConfig(FileConfig.Location.GIT)
     public File getGitLocation() {
         return Paths.get(System.getProperty("blog.git.location")).toFile();
+    }
+
+    @Produces
+    @FileConfig(FileConfig.Location.MAP_DB)
+    public File getMapDBLocation() {
+        return Paths.get(System.getProperty("blog.map_db.location")).toFile();
     }
 
     @Produces

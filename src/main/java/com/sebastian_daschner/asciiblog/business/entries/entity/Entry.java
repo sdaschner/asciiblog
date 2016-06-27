@@ -16,10 +16,11 @@
 
 package com.sebastian_daschner.asciiblog.business.entries.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Entry {
+public class Entry implements Serializable {
 
     private final String link;
     private final String title;

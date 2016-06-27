@@ -16,6 +16,7 @@
 
 package com.sebastian_daschner.asciiblog.business.source.control;
 
+import com.sebastian_daschner.asciiblog.business.environment.control.FileConfig;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -52,6 +53,7 @@ import static org.eclipse.jgit.lib.Constants.MASTER;
 public class GitExtractor {
 
     @Inject
+    @FileConfig(FileConfig.Location.GIT)
     File gitDirectory;
 
     @Inject
