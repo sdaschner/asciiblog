@@ -23,10 +23,8 @@ import javax.mvc.Controller;
 import javax.mvc.Models;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
