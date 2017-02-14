@@ -17,7 +17,6 @@
 package com.sebastian_daschner.asciiblog.business.entries.control;
 
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
-import com.sebastian_daschner.asciiblog.business.environment.control.FileConfig;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
@@ -26,8 +25,8 @@ import javax.annotation.PreDestroy;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
-import javax.inject.Inject;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -37,22 +36,23 @@ import java.util.stream.Collectors;
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class EntryCache {
 
+    private static final String MAPDB_LOCATION = "/asciiblog/entries.mapdb";
+
     /**
      * The blog entries identified by the entry name.
      */
     private Map<String, Entry> entries;
     private DB mapDB;
 
-    @Inject
-    @FileConfig(FileConfig.Location.MAP_DB)
-    File mapDBFile;
-
     @PostConstruct
     public void initCache() {
+        final File mapDBFile = Paths.get(MAPDB_LOCATION).toFile();
+
         mapDB = DBMaker.newFileDB(mapDBFile)
                 // TODO perf test
 //                .mmapFileEnable()
                 .make();
+
         entries = mapDB.getHashMap("asciiblog-entries");
     }
 

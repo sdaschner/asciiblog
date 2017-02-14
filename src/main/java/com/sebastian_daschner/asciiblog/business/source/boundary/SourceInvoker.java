@@ -26,7 +26,9 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @Singleton
@@ -46,18 +48,26 @@ public class SourceInvoker {
     Logger logger;
 
     @Asynchronous
-    @Schedule(minute = "*/10", hour = "*")
+    @Schedule(minute = "*/10", hour = "*", persistent = false)
     public void checkNewEntries() {
         final ChangeSet changes = gitExtractor.getChanges();
 
-        changes.getChangedFiles().entrySet().stream()
+        compileChangedFiles(changes.getChangedFiles());
+
+        removeFiles(changes.getRemovedFiles());
+    }
+
+    private void compileChangedFiles(final Map<String, String> changedFiles) {
+        changedFiles.entrySet().stream()
                 .map(e -> entryCompiler.compile(e.getKey(), e.getValue())).filter(Objects::nonNull)
                 .forEach(e -> {
                     cache.store(e);
                     logger.info("Added entry " + e.getLink());
                 });
+    }
 
-        changes.getRemovedFiles().forEach(e -> {
+    private void removeFiles(final Set<String> removedFiles) {
+        removedFiles.forEach(e -> {
             cache.remove(e);
             logger.info("Removed entry " + e);
         });

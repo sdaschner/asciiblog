@@ -27,6 +27,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -38,25 +39,25 @@ public class GitExtractorTest {
     private File gitCloneDirectory;
     private File file1;
     private File file2;
+    private File gitDirectory;
 
     @Before
-    public void setUp() throws IOException, GitAPIException {
+    public void setUp() throws Exception {
+        gitDirectory = Files.createTempDirectory("git-blog-").toFile();
+
         cut = new GitExtractor();
         // assuming that normalizer works correct
-        cut.fileNameNormalizer = new FileNameNormalizer();
-        cut.gitDirectory = Files.createTempDirectory("git-blog-").toFile();
         gitCloneDirectory = Files.createTempDirectory("git-clone-").toFile();
         file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1.adoc").toFile();
         file2 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file2.adoc").toFile();
 
         initGitAndClone();
         addTestCommits();
+        openGit();
     }
 
     @Test
-    public void testGetChanges() throws GitAPIException, IOException {
-        cut.openGit();
-
+    public void testGetChanges() throws Exception {
         ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
                 .andChangedFile("file1", "hello world\nhello world")
                 .andChangedFile("file2", "hi world").build();
@@ -75,8 +76,7 @@ public class GitExtractorTest {
     }
 
     @Test
-    public void testGetChangesRenamedEntry() throws IOException, GitAPIException {
-        cut.openGit();
+    public void testGetChangesRenamedEntry() throws Exception {
         createNextCommit();
 
         ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
@@ -97,8 +97,7 @@ public class GitExtractorTest {
     }
 
     @Test
-    public void testGetChangesDeletedEntry() throws IOException, GitAPIException {
-        cut.openGit();
+    public void testGetChangesDeletedEntry() throws Exception {
         createNextCommit();
 
         ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
@@ -118,8 +117,7 @@ public class GitExtractorTest {
     }
 
     @Test
-    public void testGetChangesChangedAndRenamedEntry() throws IOException, GitAPIException {
-        cut.openGit();
+    public void testGetChangesChangedAndRenamedEntry() throws Exception {
         createNextCommit();
 
         ChangeSet expectedChanges = ChangeSetBuilder.withRemovedFiles()
@@ -140,8 +138,7 @@ public class GitExtractorTest {
     }
 
     @Test
-    public void testGetChangesIgnoreNonAsciiDocFiles() throws IOException, GitAPIException {
-        cut.openGit();
+    public void testGetChangesIgnoreNonAsciiDocFiles() throws Exception {
         createNextCommit();
         addNotRelevantFile("foobar");
 
@@ -186,8 +183,28 @@ public class GitExtractorTest {
 
     @After
     public void tearDown() throws IOException {
-        delete(cut.gitDirectory);
+        delete(gitDirectory);
         delete(gitCloneDirectory);
+    }
+
+    private void openGit() throws Exception {
+        final File workingDir = Files.createTempDirectory("blog-git").toFile();
+
+        final Git git = Git.cloneRepository()
+                .setDirectory(workingDir)
+                .setURI(gitDirectory.getAbsolutePath())
+                .call();
+
+        final ChangeCalculator changeCalculator = new ChangeCalculator(git);
+
+        inject("git", git);
+        inject("changeCalculator", changeCalculator);
+    }
+
+    private void inject(final String fieldName, final Object object) throws NoSuchFieldException, IllegalAccessException {
+        final Field field = GitExtractor.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(cut, object);
     }
 
     private static void delete(final File f) throws IOException {
@@ -201,8 +218,8 @@ public class GitExtractorTest {
     }
 
     private void initGitAndClone() throws GitAPIException {
-        Git.init().setDirectory(cut.gitDirectory).setBare(true).call().close();
-        Git.cloneRepository().setURI(cut.gitDirectory.getAbsolutePath()).setDirectory(gitCloneDirectory).call().close();
+        Git.init().setDirectory(gitDirectory).setBare(true).call().close();
+        Git.cloneRepository().setURI(gitDirectory.getAbsolutePath()).setDirectory(gitCloneDirectory).call().close();
     }
 
     private void addTestCommits() throws IOException, GitAPIException {

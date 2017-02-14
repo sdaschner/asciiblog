@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-package com.sebastian_daschner.asciiblog.business.environment.control;
+package com.sebastian_daschner.asciiblog.business;
 
-import javax.inject.Qualifier;
-import java.lang.annotation.*;
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
+import java.net.URI;
+import java.util.logging.Logger;
 
-/**
- * Qualifier for file system configurations.
- */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-@Documented
-public @interface FileConfig {
+public class EnvironmentDataProvider {
 
-    /**
-     * The file config location.
-     */
-    Location value();
+    @Produces
+    public URI getHomeUri() {
+        return URI.create(System.getProperty("blog.uri.home"));
+    }
 
-    /**
-     * The file config locations.
-     */
-    enum Location {
-        GIT, MAP_DB
+    @Produces
+    public Logger getLogger(InjectionPoint injectionPoint) {
+        return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
     }
 
 }
