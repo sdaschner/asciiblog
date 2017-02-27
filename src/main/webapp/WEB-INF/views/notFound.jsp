@@ -24,7 +24,7 @@
                 <a href="/">Blog</a>
             </li>
             <li>
-                <a href="${homeUri}/services">Services</a>
+                <a href="${homeUri}/offerings">Offerings</a>
             </li>
             <li>
                 <a href="${homeUri}/contact">Contact</a>
