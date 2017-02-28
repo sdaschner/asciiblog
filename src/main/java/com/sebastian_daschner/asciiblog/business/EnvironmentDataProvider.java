@@ -25,7 +25,12 @@ public class EnvironmentDataProvider {
 
     @Produces
     public URI getHomeUri() {
-        return URI.create(System.getProperty("blog.uri.home"));
+        return URI.create(System.getProperty("website.home.uri"));
+    }
+
+    @Produces
+    public String getGitUri() {
+        return System.getProperty("blog.git.uri");
     }
 
     @Produces

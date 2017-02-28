@@ -16,19 +16,22 @@
 
 package com.sebastian_daschner.asciiblog.business.source.control;
 
+import com.jcraft.jsch.Session;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.transport.*;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static org.eclipse.jgit.lib.Constants.MASTER;
@@ -37,21 +40,22 @@ import static org.eclipse.jgit.lib.Constants.MASTER;
 @Singleton
 public class GitExtractor {
 
-    private static final String GIT_LOCATION = "/asciiblog/source";
-
     private ChangeCalculator changeCalculator;
     private Git git;
     private ObjectId lastCommit;
 
+    @Inject
+    String gitUri;
+
     @PostConstruct
     public void openGit() {
         try {
-            final File gitDirectory = Paths.get(GIT_LOCATION).toFile();
             final File workingDir = Files.createTempDirectory("blog-git").toFile();
 
             git = Git.cloneRepository()
                     .setDirectory(workingDir)
-                    .setURI(gitDirectory.getAbsolutePath())
+                    .setTransportConfigCallback(new SshTransportConfigCallback())
+                    .setURI(gitUri)
                     .call();
 
             changeCalculator = new ChangeCalculator(git);
@@ -108,6 +112,23 @@ public class GitExtractor {
             Stream.of(files).forEach(this::delete);
         if (!file.delete())
             throw new IllegalStateException("Could not delete file: " + file);
+    }
+
+    private static class SshTransportConfigCallback implements TransportConfigCallback {
+
+        private final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(final OpenSshConfig.Host hc, final Session session) {
+                session.setConfig("StrictHostKeyChecking", "no");
+            }
+        };
+
+        @Override
+        public void configure(final Transport transport) {
+            SshTransport sshTransport = (SshTransport) transport;
+            sshTransport.setSshSessionFactory(sshSessionFactory);
+        }
+
     }
 
 }
