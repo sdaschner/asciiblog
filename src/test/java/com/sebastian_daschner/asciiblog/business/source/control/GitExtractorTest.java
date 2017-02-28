@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -51,6 +52,7 @@ public class GitExtractorTest {
         file1 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file1.adoc").toFile();
         file2 = Paths.get(gitCloneDirectory.getAbsolutePath(), "file2.adoc").toFile();
 
+        deactivateTransportCallback();
         initGitAndClone();
         addTestCommits();
         openGit();
@@ -307,6 +309,17 @@ public class GitExtractorTest {
         git.commit().setMessage("added template").call();
         git.push().setRemote("origin").add("master").call();
         git.close();
+    }
+
+    private void deactivateTransportCallback() throws ReflectiveOperationException {
+        final Field field = GitExtractor.class.getDeclaredField("transportConfigCallback");
+
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.setAccessible(true);
+        field.set(cut, null);
     }
 
 }
