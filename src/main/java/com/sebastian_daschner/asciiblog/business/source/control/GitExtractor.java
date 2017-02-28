@@ -40,6 +40,7 @@ import static org.eclipse.jgit.lib.Constants.MASTER;
 @Singleton
 public class GitExtractor {
 
+    private final TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
     private ChangeCalculator changeCalculator;
     private Git git;
     private ObjectId lastCommit;
@@ -54,13 +55,13 @@ public class GitExtractor {
 
             git = Git.cloneRepository()
                     .setDirectory(workingDir)
-                    .setTransportConfigCallback(new SshTransportConfigCallback())
+                    .setTransportConfigCallback(transportConfigCallback)
                     .setURI(gitUri)
                     .call();
 
             changeCalculator = new ChangeCalculator(git);
         } catch (IOException | GitAPIException e) {
-            throw new IllegalStateException("Could not open Git repository.", e);
+            throw new RuntimeException("Could not open Git repository.", e);
         }
     }
 
@@ -85,14 +86,14 @@ public class GitExtractor {
             return changeCalculator.getChanges(lastCommit, currentCommit);
 
         } catch (IOException | GitAPIException e) {
-            return new ChangeSet();
+            throw new RuntimeException(e);
         } finally {
             lastCommit = currentCommit;
         }
     }
 
     private void updateGit() throws GitAPIException {
-        git.pull().call();
+        git.pull().setTransportConfigCallback(transportConfigCallback).call();
     }
 
     private ObjectId getLatestCommit() throws IOException {

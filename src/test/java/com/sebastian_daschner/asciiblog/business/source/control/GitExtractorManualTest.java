@@ -35,6 +35,7 @@ public class GitExtractorManualTest {
     @Before
     public void setUp() throws IOException, GitAPIException {
         cut = new GitExtractor();
+        cut.gitUri = "ssh://example.com/blog.git";
     }
 
     @Test
