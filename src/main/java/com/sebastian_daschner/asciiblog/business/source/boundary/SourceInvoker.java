@@ -22,7 +22,6 @@ import com.sebastian_daschner.asciiblog.business.source.control.GitExtractor;
 import com.sebastian_daschner.asciiblog.business.source.entity.ChangeSet;
 
 import javax.ejb.Asynchronous;
-import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -48,7 +47,6 @@ public class SourceInvoker {
     Logger logger;
 
     @Asynchronous
-    @Schedule(minute = "*/10", hour = "*", persistent = false)
     public void checkNewEntries() {
         final ChangeSet changes = gitExtractor.getChanges();
 
