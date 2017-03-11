@@ -29,6 +29,9 @@
                 <li>
                     <a href="/">Blog</a>
                 </li>
+                <li>
+                    <a href="${homeUri}/news">News</a>
+                </li>
             </ul>
         </header>
         <main>
