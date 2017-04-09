@@ -43,6 +43,9 @@ public class EntryCache {
      */
     private Map<String, Entry> entries;
     private DB mapDB;
+    private Comparator<Entry> comparator = Comparator
+            .comparing(Entry::getDate).reversed()
+            .thenComparing(Entry::getTitle);
 
     @PostConstruct
     public void initCache() {
@@ -63,14 +66,14 @@ public class EntryCache {
 
     public List<Entry> getLastEntries(final int number) {
         return entries.values().stream()
-                .sorted(Comparator.comparing(Entry::getDate).reversed())
+                .sorted(comparator)
                 .limit(number)
                 .collect(Collectors.toList());
     }
 
     public List<Entry> getAllEntries() {
         return entries.values().stream()
-                .sorted(Comparator.comparing(Entry::getDate).reversed())
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 

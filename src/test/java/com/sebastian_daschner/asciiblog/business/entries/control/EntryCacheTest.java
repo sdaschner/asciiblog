@@ -45,6 +45,7 @@ public class EntryCacheTest {
     private Entry entry2;
     private Entry entry3;
     private Entry entry4;
+    private Entry entry5;
 
     @Before
     public void setUp() throws ReflectiveOperationException {
@@ -99,6 +100,16 @@ public class EntryCacheTest {
     }
 
     @Test
+    public void testGetAllEntriesSameDay() {
+        insertSameDayEntry();
+
+        final List<Entry> actual = cut.getAllEntries();
+        assertThat(actual, is(asList(entry3, entry5, entry4, entry1, entry2)));
+
+        verifyZeroInteractions(mapDBMock);
+    }
+
+    @Test
     public void testStore() {
         final Entry newEntry = new Entry("entry5", "Entry 5", LocalDate.of(2016, 5, 3), "foobar 5", "foobar <html><h5>");
         cut.store(newEntry);
@@ -146,6 +157,11 @@ public class EntryCacheTest {
         entriesMap.put("entry2", entry2);
         entriesMap.put("entry3", entry3);
         entriesMap.put("entry4", entry4);
+    }
+
+    public void insertSameDayEntry() {
+        entry5 = new Entry("entry5", "Entry 1.5", LocalDate.of(2016, 1, 4), "foobar 5", "foobar <html><h5>");
+        entriesMap.put("entry5", entry5);
     }
 
 }
