@@ -29,7 +29,7 @@ import java.util.List;
 @Stateless
 public class EntryStore {
 
-    private static final int NUMBER_TEASERS = 6;
+    private static final int NUMBER_TEASERS = 8;
 
     @Inject
     EntryCache cache;
