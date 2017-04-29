@@ -24,6 +24,9 @@
                     <a href="${homeUri}/about">About</a>
                 </li>
                 <li>
+                    <a href="${homeUri}/contact">Contact</a>
+                </li>
+                <li>
                     <a href="${homeUri}/offerings">Offerings</a>
                 </li>
                 <li>
