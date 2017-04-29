@@ -40,7 +40,7 @@
             ${entry.content}
 
             <p>&nbsp;</p>
-            <p>Did you like the post? Subscribe to my newsletter for more free content, tips and tricks on IT &amp; Java:</p>
+            <p>Found the post useful? Subscribe to my newsletter for more free content, tips and tricks on IT &amp; Java:</p>
             <script src="https://assets.convertkit.com/assets/CKJS4.js?v=21"></script>
             <div class="ck_form_container ck_inline" data-ck-version="6">
                 <div class="ck_form ck_naked">
