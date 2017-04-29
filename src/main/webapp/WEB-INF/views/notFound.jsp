@@ -13,7 +13,7 @@
 <div id="content">
     <header>
         <h1>
-            <a href="${homeUri}"><strong>sebastiandaschner</strong> blog</a>
+            <a href="/"><strong>sebastiandaschner</strong> blog</a>
         </h1>
         <hr>
         <ul>
