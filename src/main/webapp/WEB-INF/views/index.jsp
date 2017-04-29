@@ -13,13 +13,10 @@
     <div id="content">
         <header>
             <h1>
-                <a href="/"><strong>sebastiandaschner</strong> blog</a>
+                <a href="${homeUri}"><strong>sebastiandaschner</strong> blog</a>
             </h1>
             <hr>
             <ul>
-                <li>
-                    <a href="${homeUri}">Home</a>
-                </li>
                 <li>
                     <a href="${homeUri}/about">About</a>
                 </li>
