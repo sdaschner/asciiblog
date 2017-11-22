@@ -17,52 +17,28 @@
 package com.sebastian_daschner.asciiblog.business.entries.control;
 
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class EntryCache {
 
-    private static final String MAPDB_LOCATION = "/asciiblog/entries.mapdb";
-
     /**
      * The blog entries identified by the entry name.
      */
-    private Map<String, Entry> entries;
-    private DB mapDB;
+    private Map<String, Entry> entries = new ConcurrentHashMap<>();
+
     private Comparator<Entry> comparator = Comparator
             .comparing(Entry::getDate).reversed()
             .thenComparing(Entry::getTitle);
-
-    @PostConstruct
-    public void initCache() {
-        final File mapDBFile = Paths.get(MAPDB_LOCATION).toFile();
-
-        mapDB = DBMaker.newFileDB(mapDBFile)
-                // TODO perf test
-//                .mmapFileEnable()
-                .make();
-
-        entries = mapDB.getHashMap("asciiblog-entries");
-    }
-
-    @PreDestroy
-    public void closeCache() {
-        mapDB.close();
-    }
 
     public List<Entry> getLastEntries(final int number) {
         return entries.values().stream()
@@ -83,12 +59,10 @@ public class EntryCache {
 
     public void store(final Entry entry) {
         entries.put(entry.getLink(), entry);
-        mapDB.commit();
     }
 
     public void remove(final String name) {
         entries.remove(name);
-        mapDB.commit();
     }
 
 }

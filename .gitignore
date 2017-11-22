@@ -8,3 +8,4 @@ release.properties
 *.iml
 .idea/
 *.sh
+glassfish/*.jar

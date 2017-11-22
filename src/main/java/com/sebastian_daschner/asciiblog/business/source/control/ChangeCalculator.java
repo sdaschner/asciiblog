@@ -127,7 +127,8 @@ class ChangeCalculator {
     private Stream<String> getRemovedFilePaths(final List<DiffEntry> diff) {
         return diff.stream()
                 .filter(d -> d.getChangeType() == DiffEntry.ChangeType.DELETE || d.getChangeType() == DiffEntry.ChangeType.RENAME)
-                .map(DiffEntry::getOldPath);
+                .map(DiffEntry::getOldPath)
+                .filter(this::isRelevant);
     }
 
     private AbstractTreeIterator prepareTreeParser(final ObjectId commit) throws IOException {

@@ -1,5 +1,5 @@
 <%@ page contentType="application/rss+xml;charset=UTF-8" language="java" %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@ taglib prefix="blog" uri="/WEB-INF/blog.tld" %><?xml version="1.0" encoding="UTF-8" ?>
-<?xml-stylesheet type="text/css" href="${homeUri}/css/rss.css" ?>
+<?xml-stylesheet type="text/css" href="https://www.sebastian-daschner.com/css/rss.css" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Blog - Sebastian Daschner</title>
@@ -13,7 +13,7 @@
         <atom:link href="https://blog.sebastian-daschner.com/feeds/rss" rel="self" type="application/rss+xml" />
         <c:forEach var="entry" items="${entries}">
             <item>
-                <title>${entry.title}</title>
+                <title><blog:formatHead title="${entry.title}"/></title>
                 <description>${entry.abstractContent}</description>
                 <link>https://blog.sebastian-daschner.com/entries/${entry.link}</link>
                 <guid isPermaLink="true">https://blog.sebastian-daschner.com/entries/${entry.link}</guid>

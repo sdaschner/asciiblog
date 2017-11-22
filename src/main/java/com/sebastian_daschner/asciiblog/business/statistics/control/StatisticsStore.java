@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package com.sebastian_daschner.asciiblog.business;
+package com.sebastian_daschner.asciiblog.business.statistics.control;
 
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import java.util.logging.Logger;
+import io.prometheus.client.Counter;
 
-public class EnvironmentDataProvider {
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 
-    @Produces
-    public String getGitUri() {
-        return System.getenv("ASCIIBLOG_GIT_URI");
+@ApplicationScoped
+public class StatisticsStore {
+
+    private Counter entryAccesses;
+
+    @PostConstruct
+    private void initCounter() {
+        entryAccesses = Counter.build("entry_requests_total", "Total number of entry requests")
+                .labelNames("path")
+                .register();
     }
 
-    @Produces
-    public Logger getLogger(InjectionPoint injectionPoint) {
-        return Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getName());
+    public void onNewEntryAccess(@Observes final String access) {
+        entryAccesses.labels(access).inc();
     }
 
 }

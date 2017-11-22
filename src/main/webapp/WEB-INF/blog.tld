@@ -22,4 +22,15 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+    <tag>
+        <name>formatHead</name>
+        <tag-class>com.sebastian_daschner.asciiblog.presentation.document.FormatHeadTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>title</name>
+            <required>true</required>
+            <type>java.lang.String</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
 </taglib>

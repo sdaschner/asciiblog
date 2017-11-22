@@ -16,36 +16,28 @@
 
 package com.sebastian_daschner.asciiblog.business.statistics.boundary;
 
-import javax.inject.Inject;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.common.TextFormat;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Comparator;
-import java.util.Map;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 @Path("statistics")
 @Produces(MediaType.TEXT_PLAIN)
 public class StatisticsResource {
 
-    @Inject
-    Statistics statistics;
-
     @GET
-    public String getStatistics() {
-        final StringBuilder builder = new StringBuilder();
-
-        statistics.getDailyAccesses().entrySet().stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .forEach(e -> {
-                    builder.append(e.getKey()).append(":\n");
-                    e.getValue().entrySet().stream()
-                            .sorted(Comparator.comparing(Map.Entry::getKey))
-                            .forEach(a -> builder.append(a.getKey()).append(": ").append(a.getValue()).append('\n'));
-                    builder.append('\n');
-                });
-
-        return builder.toString();
+    public StreamingOutput getStatistics() {
+        return output -> {
+            try (Writer writer = new OutputStreamWriter(output)) {
+                TextFormat.write004(writer, CollectorRegistry.defaultRegistry.metricFamilySamples());
+            }
+        };
     }
 
 }

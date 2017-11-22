@@ -7,7 +7,7 @@
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
     <title>404 - Blog - Sebastian Daschner</title>
-    <link rel="stylesheet" href="${homeUri}/css/style.css"/>
+    <link rel="stylesheet" href="https://www.sebastian-daschner.com/css/style.css"/>
 </head>
 <body>
 <div id="content">
@@ -18,19 +18,19 @@
         <hr>
         <ul>
             <li>
-                <a href="${homeUri}/about">About</a>
+                <a href="https://www.sebastian-daschner.com/about">About</a>
             </li>
             <li>
-                <a href="${homeUri}/offerings">Offerings</a>
+                <a href="https://www.sebastian-daschner.com/offerings/">Offerings</a>
             </li>
             <li>
-                <a href="${homeUri}/contact">Contact</a>
+                <a href="https://www.sebastian-daschner.com/contact">Contact</a>
             </li>
             <li>
                 <a href="/">Blog</a>
             </li>
             <li>
-                <a href="${homeUri}/news">News</a>
+                <a href="https://www.sebastian-daschner.com/news/">News</a>
             </li>
         </ul>
     </header>

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
-    <title>${entry.title} - Sebastian Daschner</title>
-    <link rel="stylesheet" href="${homeUri}/css/style.css"/>
+    <title><blog:formatHead title="${entry.title} - Sebastian Daschner"/></title>
+    <link rel="stylesheet" href="https://www.sebastian-daschner.com/css/style.css"/>
     <link rel="alternate" type="application/rss+xml" title="Blog - Sebastian Daschner" href="/feeds/rss"/>
 </head>
 <body>
@@ -18,19 +18,19 @@
             <hr>
             <ul>
                 <li>
-                    <a href="${homeUri}/about">About</a>
+                    <a href="https://www.sebastian-daschner.com/about">About</a>
                 </li>
                 <li>
-                    <a href="${homeUri}/offerings">Offerings</a>
+                    <a href="https://www.sebastian-daschner.com/offerings/">Offerings</a>
                 </li>
                 <li>
-                    <a href="${homeUri}/contact">Contact</a>
+                    <a href="https://www.sebastian-daschner.com/contact">Contact</a>
                 </li>
                 <li>
                     <a href="/">Blog</a>
                 </li>
                 <li>
-                    <a href="${homeUri}/news">News</a>
+                    <a href="https://www.sebastian-daschner.com/news/">News</a>
                 </li>
             </ul>
         </header>

@@ -19,7 +19,6 @@ package com.sebastian_daschner.asciiblog.business.entries.control;
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import org.junit.Before;
 import org.junit.Test;
-import org.mapdb.DB;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -33,13 +32,11 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
 
 public class EntryCacheTest {
 
     private EntryCache cut;
     private Map<String, Entry> entriesMap;
-    private DB mapDBMock;
 
     private Entry entry1;
     private Entry entry2;
@@ -51,7 +48,6 @@ public class EntryCacheTest {
     public void setUp() throws ReflectiveOperationException {
         cut = new EntryCache();
         entriesMap = new HashMap<>();
-        mapDBMock = mock(DB.class);
 
         injectFields();
         initTestEntries();
@@ -70,16 +66,12 @@ public class EntryCacheTest {
 
         actual = cut.get("entry2");
         assertThat(actual, is(entry2));
-
-        verifyZeroInteractions(mapDBMock);
     }
 
     @Test
     public void testGetAllEntries() {
         final List<Entry> actual = cut.getAllEntries();
         assertThat(actual, is(asList(entry3, entry4, entry1, entry2)));
-
-        verifyZeroInteractions(mapDBMock);
     }
 
     @Test
@@ -95,8 +87,6 @@ public class EntryCacheTest {
 
         actual = cut.getLastEntries(5);
         assertThat(actual, is(asList(entry3, entry4, entry1, entry2)));
-
-        verifyZeroInteractions(mapDBMock);
     }
 
     @Test
@@ -105,46 +95,34 @@ public class EntryCacheTest {
 
         final List<Entry> actual = cut.getAllEntries();
         assertThat(actual, is(asList(entry3, entry5, entry4, entry1, entry2)));
-
-        verifyZeroInteractions(mapDBMock);
     }
 
     @Test
     public void testStore() {
         final Entry newEntry = new Entry("entry5", "Entry 5", LocalDate.of(2016, 5, 3), "foobar 5", "foobar <html><h5>");
         cut.store(newEntry);
-        verify(mapDBMock).commit();
 
         assertThat(cut.get("entry5"), is(newEntry));
 
         final List<Entry> allEntries = cut.getAllEntries();
         assertThat(allEntries.size(), is(5));
         assertThat(allEntries.get(0), is(newEntry));
-
-        verifyNoMoreInteractions(mapDBMock);
     }
 
     @Test
     public void testRemove() {
         cut.remove("entry1");
-        verify(mapDBMock).commit();
 
         assertThat(cut.get("entry1"), nullValue());
 
         final List<Entry> allEntries = cut.getAllEntries();
         assertThat(allEntries, is(asList(entry3, entry4, entry2)));
-
-        verifyNoMoreInteractions(mapDBMock);
     }
 
     private void injectFields() throws ReflectiveOperationException {
         final Field entriesField = cut.getClass().getDeclaredField("entries");
         entriesField.setAccessible(true);
         entriesField.set(cut, entriesMap);
-
-        final Field mapDBField = cut.getClass().getDeclaredField("mapDB");
-        mapDBField.setAccessible(true);
-        mapDBField.set(cut, mapDBMock);
     }
 
     private void initTestEntries() {
