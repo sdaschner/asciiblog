@@ -16,12 +16,10 @@
 
 package com.sebastian_daschner.asciiblog.presentation.dates;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -32,22 +30,22 @@ import java.util.Locale;
  */
 public class FormatDateTag extends SimpleTagSupport {
 
-    private LocalDate value;
+    private final DateTimeFormatter rfc1123Formatter = DateTimeFormatter.RFC_1123_DATE_TIME;
+    private final DateTimeFormatter readableFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH);
+
+    private LocalDateTime value;
     private boolean rfc1123;
 
     @Override
-    public void doTag() throws JspException, IOException {
-        final String format;
-        if (rfc1123)
-            format = DateTimeFormatter.RFC_1123_DATE_TIME.format(value.atStartOfDay(ZoneOffset.UTC));
-        else
-            format = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH).format(value).toLowerCase();
+    public void doTag() throws IOException {
+        final String format = rfc1123 ?
+                rfc1123Formatter.format(value) :
+                readableFormatter.format(value).toLowerCase();
 
-        JspWriter out = getJspContext().getOut();
-        out.print(format);
+        getJspContext().getOut().print(format);
     }
 
-    public void setValue(final LocalDate value) {
+    public void setValue(final LocalDateTime value) {
         this.value = value;
     }
 

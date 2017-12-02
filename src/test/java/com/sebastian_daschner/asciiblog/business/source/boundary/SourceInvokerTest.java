@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +50,7 @@ public class SourceInvokerTest {
     public void testCheckNewEntriesNewFiles() {
         when(cut.gitExtractor.getChanges()).thenReturn(ChangeSetBuilder.withRemovedFiles()
                 .andChangedFile("file1", "= Test").andChangedFile("file2", "= Test 2").build());
-        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDate.now(), "", ""));
+        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", ""));
 
         cut.checkNewEntries();
 
@@ -79,7 +79,7 @@ public class SourceInvokerTest {
     public void testCheckNewEntriesNewAndDeletedFiles() {
         when(cut.gitExtractor.getChanges()).thenReturn(ChangeSetBuilder.withRemovedFiles("file3")
                 .andChangedFile("file1", "= Test").andChangedFile("file2", "= Test 2").build());
-        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDate.now(), "", ""));
+        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", ""));
 
         cut.checkNewEntries();
 

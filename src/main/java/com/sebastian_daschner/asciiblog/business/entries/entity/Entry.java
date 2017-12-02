@@ -17,18 +17,18 @@
 package com.sebastian_daschner.asciiblog.business.entries.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Entry implements Serializable {
 
     private final String link;
     private final String title;
-    private final LocalDate date;
+    private final LocalDateTime date;
     private final String abstractContent;
     private final String content;
 
-    public Entry(final String link, final String title, final LocalDate date, final String abstractContent, final String content) {
+    public Entry(final String link, final String title, final LocalDateTime date, final String abstractContent, final String content) {
         Objects.requireNonNull(link);
         Objects.requireNonNull(title);
         Objects.requireNonNull(date);
@@ -50,7 +50,7 @@ public class Entry implements Serializable {
         return title;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 

@@ -23,19 +23,19 @@ import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.ast.StructuredDocument;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EntryCompiler {
 
-    /**
-     * The AsciiDoc ID of the abstract content blog.
-     */
     private static final String ABSTRACT_CONTENT_ID = "abstract";
+    private static final String DOC_DATE_TIME_ATTR = "docdatetime";
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Inject
     Logger logger;
@@ -44,7 +44,8 @@ public class EntryCompiler {
         try {
             final DocumentHeader documentHeader = asciidoctor.readDocumentHeader(fileContent);
             final String headline = documentHeader.getDocumentTitle().getMain();
-            final LocalDate date = LocalDate.parse(documentHeader.getRevisionInfo().getDate());
+            String docDateTime = documentHeader.getAttributes().get(DOC_DATE_TIME_ATTR).toString();
+            final LocalDateTime date = formatter.parse(docDateTime, LocalDateTime::from);
 
             final StructuredDocument structuredDocument = asciidoctor.readDocumentStructure(fileContent, new HashMap<>());
             final String abstractContent = structuredDocument.getPartById(ABSTRACT_CONTENT_ID).getContent();

@@ -20,8 +20,8 @@ import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,11 +32,12 @@ public class EntryCompilerTest {
     @Before
     public void setUp() {
         cut = new EntryCompiler();
+        cut.logger = Logger.getLogger(EntryCompilerTest.class.getName());
     }
 
     @Test
-    public void test() throws URISyntaxException {
-        final Entry expectedEntry = new Entry("test", "Test entry", LocalDate.of(2015, 1, 1),
+    public void test() {
+        final Entry expectedEntry = new Entry("test", "Test entry", LocalDateTime.of(2015, 1, 1, 0, 0),
                 "Lorem ipsum <code>dolor</code> sit amet.<br>\n" +
                         "Lorem ipsum",
                 "<div id=\"abstract\" class=\"paragraph\">\n" +
@@ -70,7 +71,7 @@ public class EntryCompilerTest {
 
         final String content = "= Test entry\n" +
                 "Sebastian Daschner\n" +
-                "2015-01-01\n" +
+                ":docdatetime: 2015-01-01T00:00\n" +
                 "\n" +
                 "[[abstract]]\n" +
                 "Lorem ipsum `dolor` sit amet. +\n" +
@@ -87,6 +88,31 @@ public class EntryCompilerTest {
                 "- Third\n" +
                 "\n" +
                 "https://github.com/sdaschner/jaxrs-analyzer[JAX-RS Analyzer]";
+
+        final Entry actualEntry = cut.compile("test", content);
+
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void testDateTimeSeconds() {
+        final Entry expectedEntry = new Entry("test", "Test entry", LocalDateTime.of(2015, 1, 1, 1, 20, 20),
+                "Lorem ipsum",
+                "<div id=\"abstract\" class=\"paragraph\">\n" +
+                        "<p>Lorem ipsum</p>\n" +
+                        "</div>\n" +
+                        "<div class=\"paragraph\">\n" +
+                        "<p>Lorem ipsum dolor sit amet.</p>\n" +
+                        "</div>");
+
+        final String content = "= Test entry\n" +
+                "Sebastian Daschner\n" +
+                ":docdatetime: 2015-01-01T01:20:20\n" +
+                "\n" +
+                "[[abstract]]\n" +
+                "Lorem ipsum\n" +
+                "\n" +
+                "Lorem ipsum dolor sit amet.";
 
         final Entry actualEntry = cut.compile("test", content);
 

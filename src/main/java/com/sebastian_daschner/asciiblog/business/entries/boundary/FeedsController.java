@@ -25,7 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -42,7 +42,7 @@ public class FeedsController {
     @Path("rss")
     public String rss() {
         final List<Entry> teaserEntries = entryStore.getTeaserEntries();
-        final LocalDate latestDate = teaserEntries.isEmpty() ? LocalDate.now() : teaserEntries.get(0).getDate();
+        final LocalDateTime latestDate = teaserEntries.isEmpty() ? LocalDateTime.now() : teaserEntries.get(0).getDate();
 
         models.put("entries", teaserEntries);
         models.put("latestDate", latestDate);

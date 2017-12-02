@@ -50,7 +50,7 @@ class ChangeCalculator {
     /**
      * Returns a change set with all files which exist at {@code commit}.
      */
-    ChangeSet getChanges(final ObjectId commit) throws GitAPIException, IOException {
+    ChangeSet getChanges(final ObjectId commit) throws GitAPIException {
         try {
             checkout(commit.getName());
 

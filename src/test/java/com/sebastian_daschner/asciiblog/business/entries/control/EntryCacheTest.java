@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class EntryCacheTest {
 
     @Test
     public void testStore() {
-        final Entry newEntry = new Entry("entry5", "Entry 5", LocalDate.of(2016, 5, 3), "foobar 5", "foobar <html><h5>");
+        final Entry newEntry = new Entry("entry5", "Entry 5", dateTime(2016, 5, 3), "foobar 5", "foobar <html><h5>");
         cut.store(newEntry);
 
         assertThat(cut.get("entry5"), is(newEntry));
@@ -126,10 +126,10 @@ public class EntryCacheTest {
     }
 
     private void initTestEntries() {
-        entry1 = new Entry("entry1", "Entry 1", LocalDate.of(2016, 1, 3), "foobar 1", "foobar <html><h1>");
-        entry2 = new Entry("entry2", "Entry 2", LocalDate.of(2016, 1, 1), "foobar 2", "foobar <html><h2>");
-        entry3 = new Entry("entry3", "Entry 3", LocalDate.of(2016, 2, 3), "foobar 3", "foobar <html><h3>");
-        entry4 = new Entry("entry4", "Entry 4", LocalDate.of(2016, 1, 4), "foobar 4", "foobar <html><h4>");
+        entry1 = new Entry("entry1", "Entry 1", dateTime(2016, 1, 3), "foobar 1", "foobar <html><h1>");
+        entry2 = new Entry("entry2", "Entry 2", dateTime(2016, 1, 1), "foobar 2", "foobar <html><h2>");
+        entry3 = new Entry("entry3", "Entry 3", dateTime(2016, 2, 3), "foobar 3", "foobar <html><h3>");
+        entry4 = new Entry("entry4", "Entry 4", dateTime(2016, 1, 4), "foobar 4", "foobar <html><h4>");
 
         entriesMap.put("entry1", entry1);
         entriesMap.put("entry2", entry2);
@@ -138,8 +138,12 @@ public class EntryCacheTest {
     }
 
     public void insertSameDayEntry() {
-        entry5 = new Entry("entry5", "Entry 1.5", LocalDate.of(2016, 1, 4), "foobar 5", "foobar <html><h5>");
+        entry5 = new Entry("entry5", "Entry 1.5", dateTime(2016, 1, 4), "foobar 5", "foobar <html><h5>");
         entriesMap.put("entry5", entry5);
+    }
+
+    private LocalDateTime dateTime(int year, int month, int dayOfMonth) {
+        return LocalDateTime.of(year, month, dayOfMonth, 0, 0);
     }
 
 }
