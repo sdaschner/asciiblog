@@ -20,6 +20,7 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -39,7 +40,7 @@ public class FormatDateTag extends SimpleTagSupport {
     @Override
     public void doTag() throws IOException {
         final String format = rfc1123 ?
-                rfc1123Formatter.format(value) :
+                rfc1123Formatter.format(value.atOffset(ZoneOffset.UTC)) :
                 readableFormatter.format(value).toLowerCase();
 
         getJspContext().getOut().print(format);
