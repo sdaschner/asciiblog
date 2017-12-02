@@ -18,7 +18,6 @@ package com.sebastian_daschner.asciiblog.business.source.control;
 
 import com.sebastian_daschner.asciiblog.business.entries.entity.Entry;
 import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Attributes;
 import org.asciidoctor.OptionsBuilder;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.ast.StructuredDocument;
@@ -29,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.asciidoctor.AttributesBuilder.attributes;
 
 public class EntryCompiler {
 
@@ -50,19 +51,19 @@ public class EntryCompiler {
 
             final StructuredDocument structuredDocument = asciidoctor.readDocumentStructure(fileContent, new HashMap<>());
             final String abstractContent = structuredDocument.getPartById(ABSTRACT_CONTENT_ID).getContent();
-            final String content = asciidoctor.convert(fileContent, asciidoctorOptions());
+
+            OptionsBuilder options = OptionsBuilder.options()
+                    .attributes(attributes()
+                            .sourceHighlighter("coderay")
+                            .get())
+                    .toFile(false);
+            final String content = asciidoctor.convert(fileContent, options);
 
             return new Entry(name, headline, date, abstractContent, content);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not compile entry " + name, e);
             return null;
         }
-    }
-
-    private OptionsBuilder asciidoctorOptions() {
-        Attributes attributes = new Attributes();
-        attributes.setSourceHighlighter("coderay");
-        return OptionsBuilder.options().attributes(attributes).toFile(false);
     }
 
 }
