@@ -1,14 +1,13 @@
 = AsciiDoc Blog
 Sebastian Daschner
 
-A Java EE blog application with Git and AsciidoctorJ integration. Connects with a Git repository where the blog posts
--- written in AsciiDoc -- are managed.
+A blog application developed with Quarkus, with Git and AsciidoctorJ integration. Connects with a Git repository where the blog posts, written in AsciiDoc, are managed.
 
 Processes the blog posts to HTML snippets via AsciidoctorJ.
 
 For a full description see http://blog.sebastian-daschner.com/entries/blog_with_asciidoc_update[Blog written in AsciiDoc].
 
-The latest version comes with JavaEE 8 MVC (JSR 371) support. This runs on Ozark and currently has to be deployed on a Glassfish nightly build.
-See http://blog.sebastian-daschner.com/entries/asciiblog_on_mvc[AsciiBlog on JavaEE 8 MVC].
+The latest version has been built with Quarkus.
+// TODO See http://blog.sebastian-daschner.com/[AsciiBlog on JavaEE 8 MVC].
 
 The application is deployed under http://blog.sebastian-daschner.com.

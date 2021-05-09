@@ -1,0 +1,57 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <title>Blog - Sebastian Daschner</title>
+    <link rel="stylesheet" href="https://www.sebastian-daschner.com/css/style.css"/>
+    <link rel="alternate" type="application/rss+xml" title="Blog - Sebastian Daschner" href="/feeds/rss"/>
+</head>
+<body>
+<div id="content">
+    <header>
+        <h1>
+            <a href="/"><strong>sebastiandaschner</strong> blog</a>
+        </h1>
+        <hr>
+        <ul>
+            <li>
+                <a href="https://www.sebastian-daschner.com/about">About</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/publications">Publications</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/offerings/">Offerings</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/contact">Contact</a>
+            </li>
+            <li>
+                <a href="/">Blog</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/news/">News</a>
+            </li>
+        </ul>
+    </header>
+    <main>
+        {#for entry in entries}
+        <div class="teaser">
+            <h2><a href="/entries/{entry.link}">{entry.title.raw}</a></h2>
+            <span>{date:format(entry.date)}</span>
+            <p>{entry.abstractContent.raw} <br><a class="more" href="/entries/{entry.link}">read more</a></p>
+        </div>
+        {/for}
+        <p>
+            <a class="right1em" href="/entries/">All blog entries</a>
+            <a href="/tags/">All tags</a>
+        </p>
+    </main>
+</div>
+<footer>
+    <span>&copy; Sebastian Daschner, CC BY-NC-SA 4.0</span>
+</footer>
+</body>
+</html>

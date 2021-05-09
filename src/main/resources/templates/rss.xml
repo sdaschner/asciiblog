@@ -1,0 +1,23 @@
+<?xml-stylesheet type="text/css" href="https://www.sebastian-daschner.com/css/rss.css" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Blog - Sebastian Daschner</title>
+        <description>Sebastian Daschner's Java / programming / computer science blog</description>
+        <link>https://blog.sebastian-daschner.com</link>
+        <language>en-us</language>
+        <copyright>Copyright (C) {latestDate.year} Sebastian Daschner, sebastian-daschner.com</copyright>
+        <lastBuildDate>{date:formatRfc1123(latestDate)}</lastBuildDate>
+        <pubDate>{date:formatRfc1123(latestDate)}</pubDate>
+        <ttl>1440</ttl>
+        <atom:link href="https://blog.sebastian-daschner.com/feeds/rss" rel="self" type="application/rss+xml" />
+        {#for entry in entries}
+        <item>
+            <title>{blog:formatRss(entry.title).raw}</title>
+            <description>{entry.abstractContent.raw}</description>
+            <link>https://blog.sebastian-daschner.com/entries/{entry.link}</link>
+            <guid isPermaLink="true">https://blog.sebastian-daschner.com/entries/{entry.link}</guid>
+            <pubDate>{date:formatRfc1123(entry.date)}</pubDate>
+        </item>
+        {/for}
+    </channel>
+</rss>

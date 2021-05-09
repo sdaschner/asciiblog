@@ -1,0 +1,52 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <title>All blog entries - Sebastian Daschner</title>
+    <link rel="stylesheet" href="https://www.sebastian-daschner.com/css/style.css"/>
+    <link rel="alternate" type="application/rss+xml" title="Blog - Sebastian Daschner" href="/feeds/rss"/>
+</head>
+<body>
+<div id="content">
+    <header>
+        <h1>
+            <a href="/"><strong>sebastiandaschner</strong> blog</a>
+        </h1>
+        <hr>
+        <ul>
+            <li>
+                <a href="https://www.sebastian-daschner.com/about">About</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/publications">Publications</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/offerings/">Offerings</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/contact">Contact</a>
+            </li>
+            <li>
+                <a href="/">Blog</a>
+            </li>
+            <li>
+                <a href="https://www.sebastian-daschner.com/news/">News</a>
+            </li>
+        </ul>
+    </header>
+    <main>
+        <h2 class="bottom1_5em">All blog entries</h2>
+        <p>
+            {#for entry in entries}
+            <a class="no_highlight" href="/entries/{entry.link}">{entry.title.raw}</a><br>
+            {/for}
+        </p>
+    </main>
+</div>
+<footer>
+    <span>&copy; Sebastian Daschner, CC BY-NC-SA 4.0</span>
+</footer>
+</body>
+</html>
