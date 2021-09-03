@@ -33,7 +33,7 @@ public class SourceInvokerTest {
     public void testCheckNewEntriesNewFiles() {
         when(cut.gitExtractor.getChanges()).thenReturn(ChangeSetBuilder.withRemovedFiles()
                 .andChangedFile("file1", "= Test").andChangedFile("file2", "= Test 2").build());
-        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", "", Set.of()));
+        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", "", Set.of(), false));
 
         cut.checkNewEntries();
 
@@ -62,7 +62,7 @@ public class SourceInvokerTest {
     public void testCheckNewEntriesNewAndDeletedFiles() {
         when(cut.gitExtractor.getChanges()).thenReturn(ChangeSetBuilder.withRemovedFiles("file3")
                 .andChangedFile("file1", "= Test").andChangedFile("file2", "= Test 2").build());
-        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", "", Set.of()));
+        when(cut.entryCompiler.compile(anyString(), anyString())).thenReturn(new Entry("test", "Test", LocalDateTime.now(), "", "", Set.of(), false));
 
         cut.checkNewEntries();
 

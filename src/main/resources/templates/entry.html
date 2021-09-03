@@ -42,6 +42,7 @@
         <span class="date">{date:format(entry.date)}</span>
         {entry.content.raw}
 
+        {#if !entry.suppressNewsTeaser}
         <p>&nbsp;</p>
         <p>Found the post useful? Subscribe to my newsletter for more free content, tips and tricks on IT &amp; Java:</p>
         <script src="https://assets.convertkit.com/assets/CKJS4.js?v=21"></script>
@@ -77,6 +78,7 @@
                 </div>
             </div>
         </div>
+        {/if}
 
     </main>
 </div>

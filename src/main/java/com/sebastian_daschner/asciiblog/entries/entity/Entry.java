@@ -13,8 +13,9 @@ public class Entry implements Serializable {
     private final String abstractContent;
     private final String content;
     private final Set<String> tags;
+    private final boolean suppressNewsTeaser;
 
-    public Entry(String link, String title, LocalDateTime date, String abstractContent, String content, Set<String> tags) {
+    public Entry(String link, String title, LocalDateTime date, String abstractContent, String content, Set<String> tags, boolean suppressNewsTeaser) {
         Objects.requireNonNull(link);
         Objects.requireNonNull(title);
         Objects.requireNonNull(date);
@@ -28,6 +29,7 @@ public class Entry implements Serializable {
         this.abstractContent = abstractContent;
         this.content = content;
         this.tags = tags;
+        this.suppressNewsTeaser = suppressNewsTeaser;
     }
 
     public String getLink() {
@@ -54,33 +56,39 @@ public class Entry implements Serializable {
         return tags;
     }
 
+    public boolean isSuppressNewsTeaser() {
+        return suppressNewsTeaser;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Entry entry = (Entry) o;
-        return link.equals(entry.link)
-                && title.equals(entry.title)
-                && date.equals(entry.date)
-                && abstractContent.equals(entry.abstractContent)
-                && content.equals(entry.content)
-                && tags.equals(entry.tags);
+        return suppressNewsTeaser == entry.suppressNewsTeaser
+               && link.equals(entry.link)
+               && title.equals(entry.title)
+               && date.equals(entry.date)
+               && abstractContent.equals(entry.abstractContent)
+               && content.equals(entry.content)
+               && tags.equals(entry.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(link, title, date, abstractContent, content, tags);
+        return Objects.hash(link, title, date, abstractContent, content, tags, suppressNewsTeaser);
     }
 
     @Override
     public String toString() {
         return "Entry{" +
-                "link='" + link + '\'' +
-                ", title='" + title + '\'' +
-                ", date=" + date +
-                ", abstractContent='" + abstractContent + '\'' +
-                ", content='" + content + '\'' +
-                ", tags=" + tags +
-                '}';
+               "link='" + link + '\'' +
+               ", title='" + title + '\'' +
+               ", date=" + date +
+               ", abstractContent='" + abstractContent + '\'' +
+               ", content='" + content + '\'' +
+               ", tags=" + tags +
+               ", suppressNewsTeaser=" + suppressNewsTeaser +
+               '}';
     }
 }

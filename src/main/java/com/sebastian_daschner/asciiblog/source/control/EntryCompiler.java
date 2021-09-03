@@ -24,6 +24,7 @@ public class EntryCompiler {
     private static final String ABSTRACT_CONTENT_ID = "abstract";
     private static final String DOC_DATE_TIME_ATTR = "docdatetime";
     private static final String DOC_TAGS_ATTR = "tags";
+    private static final String DOC_SUPPRESS_NEWS_TEASER_ATTR = "suppressnewsteaser";
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
     private final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -34,6 +35,9 @@ public class EntryCompiler {
             final String headline = documentHeader.getDocumentTitle().getMain();
             String docDateTime = documentHeader.getAttributes().get(DOC_DATE_TIME_ATTR).toString();
             Set<String> tags = parseTags(documentHeader.getAttributes());
+            boolean suppressNewsTeaser = Boolean.parseBoolean(documentHeader.getAttributes()
+                    .getOrDefault(DOC_SUPPRESS_NEWS_TEASER_ATTR, "false")
+                    .toString());
             final LocalDateTime date = formatter.parse(docDateTime, LocalDateTime::from);
 
             Document document = asciidoctor.load(fileContent, new HashMap<>());
@@ -46,7 +50,7 @@ public class EntryCompiler {
                     .toFile(false);
             final String content = asciidoctor.convert(fileContent, options);
 
-            return new Entry(name, headline, date, abstractContent, content, tags);
+            return new Entry(name, headline, date, abstractContent, content, tags, suppressNewsTeaser);
         } catch (Exception e) {
             System.err.println("Could not compile entry " + name);
             e.printStackTrace();
